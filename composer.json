@@ -1,0 +1,46 @@
+{
+    "name": "sweetchuck/utils",
+    "description": "Common utils",
+    "license": "GPL-2.0-or-later",
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "config": {
+        "bin-dir": "bin",
+        "optimize-autoloader": true,
+        "sort-packages": true
+    },
+    "require": {
+        "php": ">=7.1",
+        "symfony/filesystem": "^4.1",
+        "webmozart/path-util": "^2.3"
+    },
+    "require-dev": {
+        "codeception/codeception": "^2.4",
+        "consolidation/robo": "^1.3",
+        "mikey179/vfsStream": "^1.6",
+        "sweetchuck/git-hooks": "^0.0",
+        "sweetchuck/robo-git": "^0.0",
+        "sweetchuck/robo-phpcs": "^0.0",
+        "sweetchuck/robo-phpmd": "^0.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Sweetchuck\\Utils\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Sweetchuck\\Utils\\Composer\\": "src-dev/Composer/",
+            "Sweetchuck\\Utils\\Test\\Helper\\": "tests/_support/Helper/",
+            "Sweetchuck\\Utils\\Tests\\Unit\\": "tests/unit/"
+        }
+    },
+    "scripts": {
+        "post-install-cmd": [
+            "\\Sweetchuck\\Utils\\Composer\\Scripts::postInstallCmd"
+        ],
+        "post-update-cmd": [
+            "\\Sweetchuck\\Utils\\Composer\\Scripts::postUpdateCmd"
+        ]
+    }
+}
