@@ -47,9 +47,6 @@ _custom:
     step__run__codeception_unit: &step__run__codeception_unit
         name: 'Codeception - unit'
         command: 'bin/robo test unit'
-    step__run__codeception_acceptance: &step__run__codeception_acceptance
-        name: 'Codeception - acceptance'
-        command: 'bin/robo test acceptance'
     step__store_test_results: &step__store_test_results
         path: 'tests/_output/machine/junit'
     step__run__codecov: &step__run__codecov
@@ -85,9 +82,6 @@ _custom:
             -
                 run:
                     <<: *step__run__codeception_unit
-            -
-                run:
-                    <<: *step__run__codeception_acceptance
             -
                 store_test_results:
                     <<: *step__store_test_results
