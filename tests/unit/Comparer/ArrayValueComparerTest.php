@@ -4,9 +4,10 @@ declare(strict_types = 1);
 
 namespace Sweetchuck\Utils\Test\Unit\Comparer;
 
+use Codeception\Test\Unit;
 use Sweetchuck\Utils\Comparer\ArrayValueComparer;
 
-class ArrayValueComparerTest extends \Codeception\Test\Unit
+class ArrayValueComparerTest extends Unit
 {
 
     /**
