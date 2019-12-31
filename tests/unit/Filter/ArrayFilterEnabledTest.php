@@ -4,10 +4,11 @@ declare(strict_types = 1);
 
 namespace Drupal\Tests\marvin\Unit\Filter;
 
+use Codeception\Test\Unit;
 use Sweetchuck\Utils\Filter\ArrayFilterEnabled;
 use Sweetchuck\Utils\Test\Helper\Dummy\Status;
 
-class ArrayFilterEnabledTest extends \Codeception\Test\Unit
+class ArrayFilterEnabledTest extends Unit
 {
     /**
      * @var \Sweetchuck\Utils\Test\UnitTester

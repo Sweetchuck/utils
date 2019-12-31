@@ -4,10 +4,11 @@ declare(strict_types = 1);
 
 namespace Drupal\Tests\marvin\Unit\Filter;
 
+use Codeception\Test\Unit;
 use org\bovigo\vfs\vfsStream;
 use Sweetchuck\Utils\Filter\ArrayFilterFileSystemExists;
 
-class ArrayFilterFileSystemExistsTest extends \Codeception\Test\Unit
+class ArrayFilterFileSystemExistsTest extends Unit
 {
     /**
      * @var \Sweetchuck\Utils\Test\UnitTester
