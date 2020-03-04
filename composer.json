@@ -10,7 +10,7 @@
         "sort-packages": true
     },
     "require": {
-        "php": ">=7.1",
+        "php": ">=7.2",
         "symfony/filesystem": "^4.1",
         "webmozart/path-util": "^2.3"
     },
@@ -32,17 +32,17 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Sweetchuck\\Utils\\Composer\\": "src-dev/Composer/",
             "Sweetchuck\\Utils\\Test\\Helper\\": "tests/_support/Helper/",
             "Sweetchuck\\Utils\\Tests\\Unit\\": "tests/unit/"
         }
     },
     "scripts": {
         "post-install-cmd": [
-            "\\Sweetchuck\\Utils\\Composer\\Scripts::postInstallCmd"
+            "\\Sweetchuck\\GitHooks\\Composer\\Scripts::deploy"
         ],
         "post-update-cmd": [
-            "\\Sweetchuck\\Utils\\Composer\\Scripts::postUpdateCmd"
-        ]
+            "\\Sweetchuck\\GitHooks\\Composer\\Scripts::deploy"
+        ],
+        "clear": "rm -rf ./bin/* ./vendor/* ./tests/_output/*"
     }
 }
