@@ -2,7 +2,7 @@
 
 declare(strict_types = 1);
 
-namespace Sweetchuck\Utils\Test\Unit\Walker;
+namespace Sweetchuck\Utils\Tests\Unit\Walker;
 
 use Codeception\Test\Unit;
 use org\bovigo\vfs\vfsStream;
