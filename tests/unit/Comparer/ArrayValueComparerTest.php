@@ -2,7 +2,7 @@
 
 declare(strict_types = 1);
 
-namespace Sweetchuck\Utils\Test\Unit\Comparer;
+namespace Sweetchuck\Utils\Tests\Unit\Comparer;
 
 use Codeception\Test\Unit;
 use Sweetchuck\Utils\Comparer\ArrayValueComparer;

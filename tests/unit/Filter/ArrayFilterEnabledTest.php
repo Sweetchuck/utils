@@ -2,7 +2,7 @@
 
 declare(strict_types = 1);
 
-namespace Drupal\Tests\marvin\Unit\Filter;
+namespace Sweetchuck\Utils\Tests\Unit\Filter;
 
 use Codeception\Test\Unit;
 use Sweetchuck\Utils\Filter\ArrayFilterEnabled;
