@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <ruleset name="Custom">
     <file>src/</file>
-    <file>src-dev/Composer/</file>
     <file>tests/</file>
     <exclude-pattern>./tests/_data/</exclude-pattern>
     <exclude-pattern>./tests/_output/</exclude-pattern>
