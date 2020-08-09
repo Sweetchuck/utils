@@ -11,7 +11,7 @@
     },
     "require": {
         "php": ">=7.2",
-        "symfony/filesystem": "^4.1",
+        "symfony/filesystem": "^4.1 || ^5.0",
         "webmozart/path-util": "^2.3"
     },
     "require-dev": {
@@ -19,11 +19,12 @@
         "codeception/module-asserts": "^1.1",
         "consolidation/robo": "^2.0",
         "mikey179/vfsstream": "^1.6",
+        "phpunit/phpunit": "^8",
         "squizlabs/php_codesniffer": "^3.5",
-        "sweetchuck/git-hooks": "^0.0",
-        "sweetchuck/robo-git": "^0.2",
-        "sweetchuck/robo-phpcs": "^0.1",
-        "sweetchuck/robo-phpmd": "^0.1"
+        "sweetchuck/git-hooks": "^0.1",
+        "sweetchuck/robo-git": "^0.3",
+        "sweetchuck/robo-phpcs": "^0.2",
+        "sweetchuck/robo-phpmd": "^0.2"
     },
     "autoload": {
         "psr-4": {
@@ -37,12 +38,7 @@
         }
     },
     "scripts": {
-        "post-install-cmd": [
-            "\\Sweetchuck\\GitHooks\\Composer\\Scripts::deploy"
-        ],
-        "post-update-cmd": [
-            "\\Sweetchuck\\GitHooks\\Composer\\Scripts::deploy"
-        ],
         "clear": "rm -rf ./bin/* ./vendor/* ./tests/_output/*"
-    }
+    },
+    "scripts-descriptions": {}
 }
