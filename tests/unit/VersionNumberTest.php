@@ -430,7 +430,7 @@ class VersionNumberTest extends Unit
             'same' => [
                 [
                     'spaceship' => 0,
-                    'spaceship_without_metadata' => 0,
+                    'spaceship_with_metadata' => 0,
                     'major' => 0,
                     'minor' => 0,
                     'patch' => 0,
@@ -444,8 +444,8 @@ class VersionNumberTest extends Unit
             ],
             'only metadata' => [
                 [
-                    'spaceship' => -1,
-                    'spaceship_without_metadata' => 0,
+                    'spaceship' => 0,
+                    'spaceship_with_metadata' => -1,
                     'major' => 0,
                     'minor' => 0,
                     'patch' => 0,
@@ -460,7 +460,7 @@ class VersionNumberTest extends Unit
             'basic' => [
                 [
                     'spaceship' => -1,
-                    'spaceship_without_metadata' => -1,
+                    'spaceship_with_metadata' => -1,
                     'major' => 1,
                     'minor' => 2,
                     'patch' => 3,
@@ -475,7 +475,7 @@ class VersionNumberTest extends Unit
             'without preRelease' => [
                 [
                     'spaceship' => -1,
-                    'spaceship_without_metadata' => -1,
+                    'spaceship_with_metadata' => -1,
                     'major' => 1,
                     'minor' => 2,
                     'patch' => 3,
@@ -490,7 +490,7 @@ class VersionNumberTest extends Unit
             'different preRelease type' => [
                 [
                     'spaceship' => -1,
-                    'spaceship_without_metadata' => -1,
+                    'spaceship_with_metadata' => -1,
                     'major' => 1,
                     'minor' => 2,
                     'patch' => 3,

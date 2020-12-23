@@ -345,11 +345,11 @@ REGEXP;
     public function diff($other): array
     {
         $diff = [
-            'spaceship' => version_compare((string) $this, (string) $other),
-            'spaceship_without_metadata' => version_compare(
+            'spaceship' => version_compare(
                 $this->format(static::FORMAT_MA0DMI0DP0R),
                 $other->format(static::FORMAT_MA0DMI0DP0R),
             ),
+            'spaceship_with_metadata' => version_compare((string) $this, (string) $other),
         ];
 
         $a = $this->jsonSerialize();
