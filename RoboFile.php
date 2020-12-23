@@ -109,6 +109,7 @@ class RoboFile extends Tasks
             ->collectionBuilder()
             ->addTask($this->taskComposerValidate())
             ->addTask($this->getTaskPhpcsLint())
+            ->addTask($this->getTaskPhpmdLint())
             ->addTask($this->getTaskCodeceptRunSuites());
     }
 
