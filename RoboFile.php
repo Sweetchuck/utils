@@ -109,7 +109,6 @@ class RoboFile extends Tasks
             ->collectionBuilder()
             ->addTask($this->taskComposerValidate())
             ->addTask($this->getTaskPhpcsLint())
-            ->addTask($this->getTaskPhpmdLint())
             ->addTask($this->getTaskCodeceptRunSuites());
     }
 
@@ -142,8 +141,7 @@ class RoboFile extends Tasks
         return $this
             ->collectionBuilder()
             ->addTask($this->taskComposerValidate())
-            ->addTask($this->getTaskPhpcsLint())
-            ->addTask($this->getTaskPhpmdLint());
+            ->addTask($this->getTaskPhpcsLint());
     }
 
     public function lintComposer()
