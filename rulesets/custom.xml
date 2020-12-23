@@ -20,7 +20,7 @@
         <properties>
             <property
                 name="exceptions"
-                value="\Sweetchuck\Utils\Filesystem,\Sweetchuck\Utils\StringFormat,\Webmozart\PathUtil\Path,\org\bovigo\vfs\vfsStream"
+                value="\Sweetchuck\Utils\Filesystem,\Sweetchuck\Utils\StringFormat,\Sweetchuck\Utils\VersionNumber,\Webmozart\PathUtil\Path,\org\bovigo\vfs\vfsStream"
                 description="Comma-separated class name list of exceptions"/>
         </properties>
     </rule>
@@ -28,7 +28,31 @@
     <rule ref="rulesets/codesize.xml">
         <exclude name="CyclomaticComplexity"/>
         <exclude name="NPathComplexity"/>
+        <exclude name="ExcessiveClassComplexity"/>
     </rule>
+
+    <rule name="ExcessiveClassComplexity"
+        since="0.2.5"
+        class="PHPMD\Rule\Design\WeightedMethodCount"
+        message="The class {0} has an overall complexity of {1} which is very high. The configured complexity threshold is {2}."
+        externalInfoUrl="https://phpmd.org/rules/codesize.html#excessiveclasscomplexity">
+        <description>
+            <![CDATA[
+The Weighted Method Count (WMC) of a class is a good indicator of how much time
+and effort is required to modify and maintain this class. The WMC metric is defined
+as the sum of complexities of all methods declared in a class. A large number of
+methods also means that this class has a greater potential impact on derived classes.
+            ]]>
+        </description>
+        <priority>3</priority>
+        <properties>
+            <property
+                name="maximum"
+                description="The maximum WMC tolerable for a class."
+                value="65"/>
+        </properties>
+    </rule>
+
     <rule name="CodeSize.CyclomaticComplexity"
         since="0.1"
         message="The {0} {1}() has a Cyclomatic Complexity of {2}. The configured cyclomatic complexity threshold is {3}."
@@ -36,11 +60,17 @@
         externalInfoUrl="http://phpmd.org/rules/codesize.html#cyclomaticcomplexity">
         <priority>3</priority>
         <properties>
-            <property name="reportLevel" value="13"
+            <property
+                name="reportLevel"
+                value="13"
                 description="The Cyclomatic Complexity reporting threshold"/>
-            <property name="showClassesComplexity" value="true"
+            <property
+                name="showClassesComplexity"
+                value="true"
                 description="Indicate if class average violation should be added to the report"/>
-            <property name="showMethodsComplexity" value="true"
+            <property
+                name="showMethodsComplexity"
+                value="true"
                 description="Indicate if class average violation should be added to the report"/>
         </properties>
     </rule>
