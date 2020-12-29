@@ -24,9 +24,10 @@ class FilesystemTest extends Unit
     {
         return [
             'not-exists' => [
-                '',
+                null,
                 'a.txt',
                 'foo',
+                null,
                 [
                     'foo' => [],
                 ],
@@ -35,6 +36,7 @@ class FilesystemTest extends Unit
                 'vfs://testFindFileUpward',
                 'a.txt',
                 '.',
+                null,
                 [
                     'a.txt' => 'okay',
                 ],
@@ -43,6 +45,7 @@ class FilesystemTest extends Unit
                 'vfs://testFindFileUpward',
                 'a.txt',
                 'foo',
+                null,
                 [
                     'a.txt' => 'okay',
                     'foo' => [],
@@ -52,6 +55,7 @@ class FilesystemTest extends Unit
                 'vfs://testFindFileUpward',
                 'a.txt',
                 'foo/bar',
+                null,
                 [
                     'a.txt' => 'okay',
                     'foo' => [
@@ -63,6 +67,7 @@ class FilesystemTest extends Unit
                 'vfs://testFindFileUpward/foo',
                 'a.txt',
                 'foo/bar',
+                null,
                 [
                     'foo' => [
                         'bar' => [],
@@ -74,11 +79,44 @@ class FilesystemTest extends Unit
                 'vfs://testFindFileUpward/foo/bar',
                 'a.txt',
                 'foo/bar',
+                null,
                 [
                     'foo' => [
                         'bar' => [
                             'a.txt' => 'okay',
                         ],
+                    ],
+                ],
+            ],
+            'multiple' => [
+                'vfs://testFindFileUpward/foo/bar',
+                'a.txt',
+                'foo/bar/baz',
+                null,
+                [
+                    'foo' => [
+                        'bar' => [
+                            'baz' => [],
+                            'a.txt' => 'okay',
+                        ],
+                        'a.txt' => 'okay',
+                    ],
+                    'a.txt' => 'okay',
+                ],
+            ],
+            'with root dir' => [
+                null,
+                'a.txt',
+                'foo/bar/baz/abc',
+                'foo/bar',
+                [
+                    'foo' => [
+                        'bar' => [
+                            'baz' => [
+                                'abc' =>[],
+                            ],
+                        ],
+                        'a.txt' => 'okay',
                     ],
                 ],
             ],
@@ -89,17 +127,31 @@ class FilesystemTest extends Unit
      * @dataProvider casesFindFileUpward
      */
     public function testFindFileUpward(
-        string $expected,
+        ?string $expected,
         string $fileName,
-        string $relativeDirectory,
+        string $currentDir,
+        ?string $rootDir,
         array $vfsStructure
     ): void {
         $vfs = vfsStream::setup(__FUNCTION__, null, $vfsStructure);
-        $absoluteDirectory = Path::join($vfs->url(), $relativeDirectory);
+        $currentDir = Path::join($vfs->url(), $currentDir);
+        if ($rootDir !== null) {
+            $rootDir = Path::join($vfs->url(), $rootDir);
+        }
 
-        static::assertEquals(
+        $this->tester->assertSame(
             $expected,
-            Filesystem::findFileUpward($fileName, $absoluteDirectory)
+            Filesystem::findFileUpward($fileName, $currentDir, $rootDir)
+        );
+    }
+
+    public function testFindFileUpwardNotParent()
+    {
+        $this->tester->expectThrowable(
+            \InvalidArgumentException::class,
+            function () {
+                Filesystem::findFileUpward('a.txt', '/a', '/b');
+            },
         );
     }
 }

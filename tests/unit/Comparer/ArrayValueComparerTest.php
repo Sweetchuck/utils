@@ -83,6 +83,6 @@ class ArrayValueComparerTest extends Unit
         }
 
         uasort($items, $comparer);
-        $this->assertSame($expected, $items);
+        $this->tester->assertSame($expected, $items);
     }
 }

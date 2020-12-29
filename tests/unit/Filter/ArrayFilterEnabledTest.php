@@ -83,6 +83,6 @@ class ArrayFilterEnabledTest extends Unit
     {
         $filter = new ArrayFilterEnabled();
         $filter->setOptions($options);
-        $this->assertSame($expected, array_filter($items, $filter));
+        $this->tester->assertSame($expected, array_filter($items, $filter));
     }
 }

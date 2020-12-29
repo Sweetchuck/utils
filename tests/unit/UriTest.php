@@ -98,7 +98,7 @@ class UriTest extends Unit
         array $parts,
         string $passwordFormat
     ): void {
-        static::assertSame(
+        $this->tester->assertSame(
             $expected,
             Uri::build($parts, $passwordFormat)
         );
