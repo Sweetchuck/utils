@@ -58,7 +58,7 @@ class StringFormatTest extends Unit
         string $format,
         array $args = []
     ): void {
-        static::assertSame(
+        $this->tester->assertSame(
             $expected,
             StringFormat::vsprintf($format, $args)
         );

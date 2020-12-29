@@ -9,27 +9,56 @@ use Webmozart\PathUtil\Path;
 class Filesystem
 {
 
+    /**
+     * @param string $fileName
+     * @param string $currentDir
+     * @param null|string $rootDir
+     *   Do not go above this directory.
+     *
+     * @return null|string
+     *   Returns NULL if the $fileName not exists in any of the parent directories,
+     *   returns the parent directory without the $fileName if the $fileName
+     *   exists in one of the parent directory.
+     */
     public static function findFileUpward(
         string $fileName,
-        string $absoluteDirectory = ''
-    ): string {
-        if (!$absoluteDirectory) {
-            $absoluteDirectory = getcwd();
+        string $currentDir,
+        ?string $rootDir = null
+    ): ?string {
+        if ($rootDir !== null && !static::isParentDirOrSame($rootDir, $currentDir)) {
+            throw new \InvalidArgumentException("The '$rootDir' is not parent dir of '$currentDir'");
         }
 
-        while ($absoluteDirectory) {
-            if (file_exists("$absoluteDirectory/$fileName")) {
-                return $absoluteDirectory;
+        while ($currentDir && ($rootDir === null || static::isParentDirOrSame($rootDir, $currentDir))) {
+            if (file_exists("$currentDir/$fileName")) {
+                return $currentDir;
             }
 
-            $parent = Path::getDirectory($absoluteDirectory);
-            if ($parent === $absoluteDirectory) {
+            $parentDir = Path::getDirectory($currentDir);
+            if ($currentDir === $parentDir) {
                 break;
             }
 
-            $absoluteDirectory = $parent;
+            $currentDir = $parentDir;
         }
 
-        return '';
+        return null;
+    }
+
+    public static function isParentDirOrSame(string $parentDir, string $childDir): bool
+    {
+        $pattern = '@^' . preg_quote($parentDir, '@') . '(/|$)@';
+
+        return (bool) preg_match($pattern, $childDir);
+    }
+
+    public static function fileGetContents(string $filePath): string
+    {
+        $fileContent = file_get_contents($filePath);
+        if ($fileContent === false) {
+            throw new \RuntimeException("File is not readable: '$filePath'", 1);
+        }
+
+        return $fileContent;
     }
 }

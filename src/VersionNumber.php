@@ -199,6 +199,8 @@ REGEXP;
 
     /**
      * @return $this
+     *
+     * @noinspection PhpMissingBreakStatementInspection
      */
     public function reset(string $fragment = 'major')
     {
@@ -268,6 +270,8 @@ REGEXP;
 
     /**
      * @return $this
+     *
+     * @noinspection PhpMissingBreakStatementInspection
      */
     protected function bumpReset(string $fragment)
     {
