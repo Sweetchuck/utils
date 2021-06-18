@@ -1,7 +1,9 @@
 <?php
 
+declare(strict_types = 1);
+
 use Consolidation\AnnotatedCommand\CommandData;
-use League\Container\ContainerInterface;
+use League\Container\Container as LeagueContainer;
 use Robo\Tasks;
 use Robo\Collection\CollectionBuilder;
 use Sweetchuck\LintReport\Reporter\BaseReporter;
@@ -21,59 +23,34 @@ class RoboFile extends Tasks
     use PhpcsTaskLoader;
     use PhpmdTaskLoader;
 
-    /**
-     * @var array
-     */
-    protected $composerInfo = [];
+    protected array $composerInfo = [];
 
-    /**
-     * @var array
-     */
-    protected $codeceptionInfo = [];
+    protected array $codeceptionInfo = [];
 
     /**
      * @var string[]
      */
-    protected $codeceptionSuiteNames = [];
+    protected array $codeceptionSuiteNames = [];
 
-    /**
-     * @var string
-     */
-    protected $packageVendor = '';
+    protected string $packageVendor = '';
 
-    /**
-     * @var string
-     */
-    protected $packageName = '';
+    protected string $packageName = '';
 
-    /**
-     * @var string
-     */
-    protected $binDir = 'vendor/bin';
+    protected string $binDir = 'vendor/bin';
 
-    /**
-     * @var string
-     */
-    protected $gitHook = '';
+    protected string $gitHook = '';
 
-    /**
-     * @var string
-     */
-    protected $envVarNamePrefix = '';
+    protected string $envVarNamePrefix = '';
 
     /**
      * Allowed values: dev, ci, prod.
-     *
-     * @var string
      */
-    protected $environmentType = '';
+    protected string $environmentType = '';
 
     /**
      * Allowed values: local, jenkins, travis, circleci.
-     *
-     * @var string
      */
-    protected $environmentName = '';
+    protected string $environmentName = '';
 
     /**
      * RoboFile constructor.
@@ -87,19 +64,27 @@ class RoboFile extends Tasks
     }
 
     /**
-     * {@inheritdoc}
+     * @hook pre-command @initLintReporters
      */
-    public function setContainer(ContainerInterface $container)
+    public function initLintReporters()
     {
-        if (!$container->has('lintCheckstyleReporter')) {
-            BaseReporter::lintReportConfigureContainer($container);
-        }
+        $lintServices = BaseReporter::getServices();
+        $container = $this->getContainer();
+        foreach ($lintServices as $name => $class) {
+            if ($container->has($name)) {
+                continue;
+            }
 
-        return parent::setContainer($container);
+            if ($container instanceof LeagueContainer) {
+                $container->share($name, $class);
+            }
+        }
     }
 
     /**
      * Git "pre-commit" hook callback.
+     *
+     * @initLintReporters
      */
     public function githookPreCommit(): CollectionBuilder
     {
@@ -110,6 +95,43 @@ class RoboFile extends Tasks
             ->addTask($this->taskComposerValidate())
             ->addTask($this->getTaskPhpcsLint())
             ->addTask($this->getTaskCodeceptRunSuites());
+    }
+
+    /**
+     * Run code style checkers.
+     *
+     * @initLintReporters
+     */
+    public function lint(): CollectionBuilder
+    {
+        return $this
+            ->collectionBuilder()
+            ->addTask($this->taskComposerValidate())
+            ->addTask($this->getTaskPhpcsLint());
+    }
+
+    /**
+     * @initLintReporters
+     */
+    public function lintComposer()
+    {
+        return $this->taskComposerValidate();
+    }
+
+    /**
+     * @initLintReporters
+     */
+    public function lintPhpcs(): CollectionBuilder
+    {
+        return $this->getTaskPhpcsLint();
+    }
+
+    /**
+     * @initLintReporters
+     */
+    public function lintPhpmd(): CollectionBuilder
+    {
+        return $this->getTaskPhpmdLint();
     }
 
     /**
@@ -131,32 +153,6 @@ class RoboFile extends Tasks
         ]
     ): CollectionBuilder {
         return $this->getTaskCodeceptRunSuites($suiteNames, $options);
-    }
-
-    /**
-     * Run code style checkers.
-     */
-    public function lint(): CollectionBuilder
-    {
-        return $this
-            ->collectionBuilder()
-            ->addTask($this->taskComposerValidate())
-            ->addTask($this->getTaskPhpcsLint());
-    }
-
-    public function lintComposer()
-    {
-        return $this->taskComposerValidate();
-    }
-
-    public function lintPhpcs(): CollectionBuilder
-    {
-        return $this->getTaskPhpcsLint();
-    }
-
-    public function lintPhpmd(): CollectionBuilder
-    {
-        return $this->getTaskPhpmdLint();
     }
 
     protected function errorOutput(): ?OutputInterface
@@ -181,8 +177,8 @@ class RoboFile extends Tasks
      */
     protected function initEnvironmentTypeAndName()
     {
-        $this->environmentType = getenv($this->getEnvVarName('environment_type'));
-        $this->environmentName = getenv($this->getEnvVarName('environment_name'));
+        $this->environmentType = (string) getenv($this->getEnvVarName('environment_type'));
+        $this->environmentName = (string) getenv($this->getEnvVarName('environment_name'));
 
         if (!$this->environmentType) {
             if (getenv('CI') === 'true') {
@@ -242,7 +238,7 @@ class RoboFile extends Tasks
         }
 
         $this->composerInfo = json_decode(file_get_contents('composer.json'), true);
-        list($this->packageVendor, $this->packageName) = explode('/', $this->composerInfo['name']);
+        [$this->packageVendor, $this->packageName] = explode('/', $this->composerInfo['name']);
 
         if (!empty($this->composerInfo['config']['bin-dir'])) {
             $this->binDir = $this->composerInfo['config']['bin-dir'];

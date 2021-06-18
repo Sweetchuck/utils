@@ -9,6 +9,7 @@ class Uri
 
     /**
      * @see \parse_url()
+     * @see \http_build_url()
      */
     public static function build(array $parts, string $passwordFormat = 'raw'): string
     {

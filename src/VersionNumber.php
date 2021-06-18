@@ -60,7 +60,7 @@ REGEXP;
      */
     const FORMAT_MA2MI2P2 = '%{major.02d}%{minor.02d}%{patch.02d}';
 
-    protected static $propertyMapping = [
+    protected static array $propertyMapping = [
         'major' => 'major',
         'minor' => 'minor',
         'patch' => 'patch',
@@ -70,7 +70,7 @@ REGEXP;
         'metadata' => 'metadata',
     ];
 
-    protected static $defaultValues = [
+    protected static array $defaultValues = [
         'major' => '',
         'minor' => '',
         'patch' => '',
@@ -78,15 +78,15 @@ REGEXP;
         'metadata' => '',
     ];
 
-    public $major = '';
+    public string $major = '';
 
-    public $minor = '';
+    public string $minor = '';
 
-    public $patch = '';
+    public string $patch = '';
 
-    public $preRelease = '';
+    public string $preRelease = '';
 
-    public $metadata = '';
+    public string $metadata = '';
 
     /**
      * @return static

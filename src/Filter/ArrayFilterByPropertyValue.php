@@ -6,10 +6,7 @@ namespace Sweetchuck\Utils\Filter;
 
 class ArrayFilterByPropertyValue extends ArrayFilterBase
 {
-    /**
-     * @var string
-     */
-    protected $property = 'name';
+    protected string $property = 'name';
 
     public function getProperty(): string
     {
@@ -26,10 +23,7 @@ class ArrayFilterByPropertyValue extends ArrayFilterBase
         return $this;
     }
 
-    /**
-     * @var array
-     */
-    protected $allowedValues = [];
+    protected array $allowedValues = [];
 
     public function getAllowedValues(): array
     {
