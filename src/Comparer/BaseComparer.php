@@ -9,19 +9,10 @@ use Sweetchuck\Utils\ComparerInterface;
 abstract class BaseComparer implements ComparerInterface
 {
 
-    /**
-     * @var bool
-     */
-    protected $ascending = true;
+    protected bool $ascending = true;
 
-    /**
-     * @var int
-     */
-    protected $result = 0;
+    protected int $result = 0;
 
-    /**
-     * {@inheritdoc}
-     */
     public function getAscending(): bool
     {
         return $this->ascending;
@@ -37,17 +28,11 @@ abstract class BaseComparer implements ComparerInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function __invoke($a, $b): int
     {
         return $this->compare($a, $b);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function compare($a, $b): int
     {
         return $this

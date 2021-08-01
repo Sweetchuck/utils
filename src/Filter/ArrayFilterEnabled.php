@@ -8,10 +8,7 @@ use Sweetchuck\Utils\EnabledInterface;
 
 class ArrayFilterEnabled extends ArrayFilterBase
 {
-    /**
-     * @var string
-     */
-    protected $key = 'enabled';
+    protected string $key = 'enabled';
 
     public function getKey(): string
     {
@@ -28,10 +25,7 @@ class ArrayFilterEnabled extends ArrayFilterBase
         return $this;
     }
 
-    /**
-     * @var bool
-     */
-    protected $defaultValue = true;
+    protected bool $defaultValue = true;
 
     public function getDefaultValue(): bool
     {

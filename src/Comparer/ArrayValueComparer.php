@@ -12,12 +12,9 @@ class ArrayValueComparer extends BaseComparer
         $this->setKeys($keys);
     }
 
-    /**
-     * @var array
-     */
-    protected $keys = [];
+    protected iterable $keys = [];
 
-    public function getKeys(): array
+    public function getKeys(): iterable
     {
         return $this->keys;
     }
@@ -25,7 +22,7 @@ class ArrayValueComparer extends BaseComparer
     /**
      * @return $this
      */
-    public function setKeys(array $value)
+    public function setKeys(iterable $value)
     {
         $this->keys = $value;
 
