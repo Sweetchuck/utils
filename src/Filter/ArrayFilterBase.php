@@ -9,14 +9,8 @@ use Sweetchuck\Utils\ArrayFilterInterface;
 abstract class ArrayFilterBase implements ArrayFilterInterface
 {
 
-    /**
-     * @var bool
-     */
-    protected $inverse = false;
+    protected bool $inverse = false;
 
-    /**
-     * {@inheritdoc}
-     */
     public function getInverse(): bool
     {
         return $this->inverse;
@@ -32,10 +26,7 @@ abstract class ArrayFilterBase implements ArrayFilterInterface
         return $this;
     }
 
-    /**
-     * @var bool
-     */
-    protected $result = true;
+    protected ?bool $result = null;
 
     /**
      * @return $this

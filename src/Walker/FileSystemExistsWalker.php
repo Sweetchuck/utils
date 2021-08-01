@@ -9,10 +9,7 @@ use Webmozart\PathUtil\Path;
 
 class FileSystemExistsWalker
 {
-    /**
-     * @var string
-     */
-    public $baseDir = '.';
+    public string $baseDir = '.';
 
     public function getBaseDir(): string
     {
@@ -29,10 +26,7 @@ class FileSystemExistsWalker
         return $this;
     }
 
-    /**
-     * @var \Symfony\Component\Filesystem\Filesystem
-     */
-    protected $fs;
+    protected Filesystem $fs;
 
     public function __construct(?Filesystem $fs = null)
     {

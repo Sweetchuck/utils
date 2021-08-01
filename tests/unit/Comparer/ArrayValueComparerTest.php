@@ -7,6 +7,9 @@ namespace Sweetchuck\Utils\Tests\Unit\Comparer;
 use Codeception\Test\Unit;
 use Sweetchuck\Utils\Comparer\ArrayValueComparer;
 
+/**
+ * @covers \Sweetchuck\Utils\Comparer\ArrayValueComparer<extended>
+ */
 class ArrayValueComparerTest extends Unit
 {
 

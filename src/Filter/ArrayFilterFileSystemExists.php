@@ -9,10 +9,7 @@ use Webmozart\PathUtil\Path;
 
 class ArrayFilterFileSystemExists extends ArrayFilterBase
 {
-    /**
-     * @var string
-     */
-    public $baseDir = '.';
+    public string $baseDir = '.';
 
     public function getBaseDir(): string
     {
@@ -43,10 +40,7 @@ class ArrayFilterFileSystemExists extends ArrayFilterBase
         return $this;
     }
 
-    /**
-     * @var \Symfony\Component\Filesystem\Filesystem
-     */
-    protected $fs;
+    protected Filesystem $fs;
 
     public function __construct(?Filesystem $fs = null)
     {
@@ -56,15 +50,15 @@ class ArrayFilterFileSystemExists extends ArrayFilterBase
     /**
      * {@inheritdoc}
      */
-    protected function checkDoIt($filePath, ?string $outerKey = null)
+    protected function checkDoIt($item, ?string $outerKey = null)
     {
         $baseDir = $this->getBaseDir();
-        $scheme = parse_url($filePath, PHP_URL_SCHEME);
-        if (!$scheme && Path::isRelative($filePath) && $baseDir) {
-            $filePath = Path::join($baseDir, $filePath);
+        $scheme = parse_url($item, PHP_URL_SCHEME);
+        if (!$scheme && Path::isRelative($item) && $baseDir) {
+            $item = Path::join($baseDir, $item);
         }
 
-        $this->result = $this->fs->exists($filePath);
+        $this->result = $this->fs->exists($item);
 
         return $this;
     }
