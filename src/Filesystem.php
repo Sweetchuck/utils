@@ -4,7 +4,7 @@ declare(strict_types = 1);
 
 namespace Sweetchuck\Utils;
 
-use Webmozart\PathUtil\Path;
+use Symfony\Component\Filesystem\Path;
 
 class Filesystem
 {
