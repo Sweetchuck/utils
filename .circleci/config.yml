@@ -47,7 +47,7 @@ commands:
                 restore_cache:
                     name: 'Composer - cache restore'
                     keys:
-                        - 'composer-{{ checksum "./composer.lock" }}-1'
+                        - 'composer-{{ checksum "./composer.lock" }}-2'
 
             -
                 run:
@@ -58,9 +58,10 @@ commands:
             -
                 save_cache:
                     name: 'Composer - cache save'
-                    key: 'composer-{{ checksum "./composer.lock" }}-1'
+                    key: 'composer-{{ checksum "./composer.lock" }}-2'
                     paths:
                         - '~/.composer/cache/'
+                        - '~/.cache/composer/'
 
     lint:
         description: 'Run linters'
