@@ -1,7 +1,29 @@
 {
+    "type": "library",
     "name": "sweetchuck/utils",
     "description": "Common utils",
     "license": "GPL-2.0-or-later",
+    "keywords": [
+        "comparer",
+        "filter",
+        "iterator",
+        "walker",
+        "filesystem",
+        "string formatter",
+        "version number"
+    ],
+    "authors": [
+        {
+            "name": "Andor",
+            "role": "Maintainer",
+            "homepage": "https://github.com/Sweetchuck"
+        }
+    ],
+    "homepage": "https://github.com/Sweetchuck/utils",
+    "support": {
+        "source": "https://github.com/Sweetchuck/utils",
+        "issues": "https://github.com/Sweetchuck/utils/issues"
+    },
     "minimum-stability": "dev",
     "prefer-stable": true,
     "config": {
