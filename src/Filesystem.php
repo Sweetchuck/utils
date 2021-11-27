@@ -47,6 +47,9 @@ class Filesystem
 
     public static function isParentDirOrSame(string $parentDir, string $childDir): bool
     {
+        # @todo Handle a/./b and a/../c formats.
+        $parentDir = preg_replace('@^\./@', '', $parentDir);
+        $childDir = preg_replace('@^\./@', '', $childDir);
         $pattern = '@^' . preg_quote($parentDir, '@') . '(/|$)@';
 
         return (bool) preg_match($pattern, $childDir);

@@ -337,6 +337,7 @@
                 "issues": "https://github.com/webmozart/path-util/issues",
                 "source": "https://github.com/webmozart/path-util/tree/2.3.0"
             },
+            "abandoned": "symfony/filesystem",
             "time": "2015-12-17T08:42:14+00:00"
         }
     ],
@@ -4116,12 +4117,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Sweetchuck/robo-phpcs.git",
-                "reference": "4db06698e61ca51e353ab4ae56e9f90c9e00a3c3"
+                "reference": "90d618cb1757193f6d900f10ff42fd331cb8ed74"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Sweetchuck/robo-phpcs/zipball/4db06698e61ca51e353ab4ae56e9f90c9e00a3c3",
-                "reference": "4db06698e61ca51e353ab4ae56e9f90c9e00a3c3",
+                "url": "https://api.github.com/repos/Sweetchuck/robo-phpcs/zipball/90d618cb1757193f6d900f10ff42fd331cb8ed74",
+                "reference": "90d618cb1757193f6d900f10ff42fd331cb8ed74",
                 "shasum": ""
             },
             "require": {
@@ -4173,7 +4174,7 @@
                 "issues": "https://github.com/Sweetchuck/robo-phpcs/issues",
                 "source": "https://github.com/Sweetchuck/robo-phpcs"
             },
-            "time": "2021-09-01T19:44:20+00:00"
+            "time": "2021-11-24T19:05:40+00:00"
         },
         {
             "name": "sweetchuck/robo-phpmd",

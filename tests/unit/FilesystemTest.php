@@ -154,4 +154,51 @@ class FilesystemTest extends Unit
             },
         );
     }
+
+    public function casesIsParentDirOrSame(): array
+    {
+        return [
+            'a/b a/b/c' => [
+                true,
+                'a/b',
+                'a/b/c',
+            ],
+            'a/b/c a/b' => [
+                false,
+                'a/b/c',
+                'a/b',
+            ],
+            'a/b/c a/b/c' => [
+                true,
+                'a/b/c',
+                'a/b/c',
+            ],
+            'a/b/c ./a/b/c' => [
+                true,
+                'a/b/c',
+                './a/b/c',
+            ],
+            './a/b/c a/b/c' => [
+                true,
+                './a/b/c',
+                'a/b/c',
+            ],
+            './a/b/c ./a/b/c' => [
+                true,
+                './a/b/c',
+                './a/b/c',
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider casesIsParentDirOrSame
+     */
+    public function testIsParentDirOrSame(bool $expected, string $parentDir, string $childDir): void
+    {
+        $this->tester->assertSame(
+            $expected,
+            Filesystem::isParentDirOrSame($parentDir, $childDir),
+        );
+    }
 }
