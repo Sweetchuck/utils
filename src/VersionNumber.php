@@ -51,6 +51,11 @@ REGEXP;
     const FORMAT_MA0MI2P2 = '%{major.d}%{minor.02d}%{patch.02d}';
 
     /**
+     * Format "1.2.3-beta4+foo" to "01".
+     */
+    const FORMAT_MA2 = '%{major.02d}';
+
+    /**
      * Format "1.2.3-beta4+foo" to "0102".
      */
     const FORMAT_MA2MI2 = '%{major.02d}%{minor.02d}';
