@@ -232,6 +232,11 @@ class VersionNumberTest extends Unit
                 VersionNumber::FORMAT_MA0MI2P2,
                 $version,
             ],
+            'MA2' => [
+                '01',
+                VersionNumber::FORMAT_MA2,
+                $version,
+            ],
             'MA2MI2' => [
                 '0102',
                 VersionNumber::FORMAT_MA2MI2,
