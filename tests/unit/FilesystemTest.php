@@ -158,6 +158,26 @@ class FilesystemTest extends Unit
     public function casesIsParentDirOrSame(): array
     {
         return [
+            'dot dot' => [
+                true,
+                '.',
+                '.',
+            ],
+            'dot dotSlash' => [
+                true,
+                '.',
+                './',
+            ],
+            'dotSlash dot' => [
+                true,
+                './',
+                '.',
+            ],
+            'dotSlash dotSlash' => [
+                true,
+                './',
+                './',
+            ],
             'a/b a/b/c' => [
                 true,
                 'a/b',
