@@ -35,8 +35,13 @@ class ArrayValueComparer extends BaseComparer
     public function setResult($a, $b)
     {
         foreach ($this->getKeys() as $key => $defaultValue) {
-            $aValue = array_key_exists($key, $a) ? $a[$key] : $defaultValue;
-            $bValue = array_key_exists($key, $b) ? $b[$key] : $defaultValue;
+            $aValue = $a instanceof \ArrayAccess ?
+                ($a->offsetExists($key) ? $a[$key] : $defaultValue)
+                : (array_key_exists($key, $a) ? $a[$key] : $defaultValue);
+
+            $bValue = $b instanceof \ArrayAccess ?
+                ($b->offsetExists($key) ? $b[$key] : $defaultValue)
+                : (array_key_exists($key, $b) ? $b[$key] : $defaultValue);
 
             $this->result = $aValue <=> $bValue;
 
