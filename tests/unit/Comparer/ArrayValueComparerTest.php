@@ -6,6 +6,7 @@ namespace Sweetchuck\Utils\Tests\Unit\Comparer;
 
 use Codeception\Test\Unit;
 use Sweetchuck\Utils\Comparer\ArrayValueComparer;
+use Sweetchuck\Utils\Test\UnitTester;
 
 /**
  * @covers \Sweetchuck\Utils\Comparer\ArrayValueComparer<extended>
@@ -13,10 +14,7 @@ use Sweetchuck\Utils\Comparer\ArrayValueComparer;
 class ArrayValueComparerTest extends Unit
 {
 
-    /**
-     * @var \Sweetchuck\Utils\Test\UnitTester
-     */
-    protected $tester;
+    protected UnitTester $tester;
 
     public function casesCompare(): array
     {
@@ -28,8 +26,8 @@ class ArrayValueComparerTest extends Unit
             ],
             'without keys' => [
                 [
-                    'i2' => ['k2' => 2],
-                    'i1' => ['k1' => 1],
+                    'i2',
+                    'i1',
                 ],
                 [
                     'i2' => ['k2' => 2],
@@ -39,10 +37,10 @@ class ArrayValueComparerTest extends Unit
             ],
             'basic' => [
                 [
-                    'i1' => ['k1' => 1, 'k2' => 1, 'k3' => 1, 'k4' => 1],
-                    'i2' => ['k1' => 1, 'k2' => 1, 'k3' => 1, 'k4' => 2],
-                    'i3' => ['k1' => 1, 'k2' => 1, 'k3' => 1, 'k4' => 3],
-                    'i4' => ['k1' => 1, 'k2' => 1, 'k3' => 1, 'k4' => 4],
+                    'i1',
+                    'i2',
+                    'i3',
+                    'i4',
                 ],
                 [
                     'i4' => ['k1' => 1, 'k2' => 1, 'k3' => 1, 'k4' => 4],
@@ -54,10 +52,10 @@ class ArrayValueComparerTest extends Unit
             ],
             'basic descending' => [
                 [
-                    'i4' => ['k1' => 1, 'k2' => 1, 'k3' => 1, 'k4' => 4],
-                    'i3' => ['k1' => 1, 'k2' => 1, 'k3' => 1, 'k4' => 3],
-                    'i2' => ['k1' => 1, 'k2' => 1, 'k3' => 1, 'k4' => 2],
-                    'i1' => ['k1' => 1, 'k2' => 1, 'k3' => 1, 'k4' => 1],
+                    'i4',
+                    'i3',
+                    'i2',
+                    'i1',
                 ],
                 [
                     'i4' => ['k1' => 1, 'k2' => 1, 'k3' => 1, 'k4' => 4],
@@ -85,7 +83,15 @@ class ArrayValueComparerTest extends Unit
             $comparer->setAscending($ascending);
         }
 
+        $itemsCopy = [];
+        foreach ($items as $key => $value) {
+            $itemsCopy[$key] = new \ArrayObject($value);
+        }
+
         uasort($items, $comparer);
-        $this->tester->assertSame($expected, $items);
+        $this->tester->assertSame($expected, array_keys($items));
+
+        uasort($itemsCopy, $comparer);
+        $this->tester->assertSame($expected, array_keys($items));
     }
 }
