@@ -221,4 +221,33 @@ class FilesystemTest extends Unit
             Filesystem::isParentDirOrSame($parentDir, $childDir),
         );
     }
+
+    public function casesNormalizeShellFileDescriptor(): array
+    {
+        return [
+            'empty' => [
+                '',
+                '',
+            ],
+            'regular file' => [
+                '/a/b.txt',
+                '/a/b.txt',
+            ],
+            'shell file descriptor' => [
+                'php://fd/42',
+                '/proc/self/fd/42',
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider casesNormalizeShellFileDescriptor
+     */
+    public function testNormalizeShellFileDescriptor(string $expected, string $fileName): void
+    {
+        $this->tester->assertSame(
+            $expected,
+            Filesystem::normalizeShellFileDescriptor($fileName),
+        );
+    }
 }
