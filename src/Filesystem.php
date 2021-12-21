@@ -72,4 +72,13 @@ class Filesystem
 
         return $fileContent;
     }
+
+    public static function normalizeShellFileDescriptor(string $fileName): string
+    {
+        return preg_replace(
+            '@^/proc/self/fd/(?P<id>\d+)$@',
+            'php://fd/$1',
+            $fileName,
+        );
+    }
 }
