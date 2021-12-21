@@ -6,6 +6,7 @@ namespace Sweetchuck\Utils\Tests\Unit\Comparer;
 
 use Codeception\Test\Unit;
 use Sweetchuck\Utils\Comparer\ArrayValueComparer;
+use Sweetchuck\Utils\ComparerInterface;
 use Sweetchuck\Utils\Test\UnitTester;
 
 /**
@@ -64,7 +65,39 @@ class ArrayValueComparerTest extends Unit
                     'i3' => ['k1' => 1, 'k2' => 1, 'k3' => 1, 'k4' => 3],
                 ],
                 ['k1' => 0, 'k2' => 0, 'k3' => 0, 'k4' => 0],
-                false,
+                -1,
+            ],
+            'complex 1' => [
+                ['a1', 'a5', 'a9', 'a20'],
+                [
+                    'a9' => ['k1' => 'a9'],
+                    'a5' => [],
+                    'a20' => ['k1' => 'a20'],
+                    'a1' => ['k1' => 'a1'],
+                ],
+                [
+                    'k1' => [
+                        'default' => 'a5',
+                    ],
+                ],
+            ],
+            'complex 2' => [
+                ['a1', 'a5-b', 'a5-a', 'a9', 'a20'],
+                [
+                    'a9' => ['k1' => 'a9'],
+                    'a5-a' => ['k2' => 'a'],
+                    'a5-b' => ['k2' => 'b'],
+                    'a20' => ['k1' => 'a20'],
+                    'a1' => ['k1' => 'a1'],
+                ],
+                [
+                    'k1' => [
+                        'default' => 'a5',
+                    ],
+                    'k2' => [
+                        'direction' => ComparerInterface::DIR_DESCENDING,
+                    ],
+                ],
             ],
         ];
     }
@@ -76,11 +109,11 @@ class ArrayValueComparerTest extends Unit
         array $expected,
         array $items,
         array $keys,
-        ?bool $ascending = null
+        ?int $direction = null
     ): void {
         $comparer = new ArrayValueComparer($keys);
-        if ($ascending !== null) {
-            $comparer->setAscending($ascending);
+        if ($direction !== null) {
+            $comparer->setDirection($direction);
         }
 
         $itemsCopy = [];
