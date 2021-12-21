@@ -9,21 +9,23 @@ use Sweetchuck\Utils\ComparerInterface;
 abstract class BaseComparer implements ComparerInterface
 {
 
-    protected bool $ascending = true;
+    protected int $direction = 1;
 
     protected int $result = 0;
 
-    public function getAscending(): bool
+    public function getDirection(): int
     {
-        return $this->ascending;
+        return $this->direction;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setAscending(bool $ascending)
+    public function setDirection(int $direction)
     {
-        $this->ascending = $ascending;
+        assert($direction !== 0);
+
+        $this->direction = $direction > 0 ? self::DIR_ASCENDING : self::DIR_DESCENDING;
 
         return $this;
     }
@@ -58,10 +60,6 @@ abstract class BaseComparer implements ComparerInterface
 
     protected function getResult(): int
     {
-        if ($this->result === 0 || $this->getAscending()) {
-            return $this->result;
-        }
-
-        return $this->result > 0 ? -1 : 1;
+        return $this->result * $this->getDirection();
     }
 }
