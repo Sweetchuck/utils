@@ -62,4 +62,16 @@ abstract class BaseComparer implements ComparerInterface
     {
         return $this->result * $this->getDirection();
     }
+
+    /**
+     * @param bool|int $input
+     */
+    protected function normalizeDirection($input): int
+    {
+        if (is_bool($input)) {
+            return $input ? self::DIR_ASCENDING : self::DIR_DESCENDING;
+        }
+
+        return intval($input) > 0 ? self::DIR_ASCENDING : self::DIR_DESCENDING;
+    }
 }

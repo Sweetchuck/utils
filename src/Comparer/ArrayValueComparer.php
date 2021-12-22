@@ -35,27 +35,9 @@ class ArrayValueComparer extends BaseComparer
     public function setResult($a, $b)
     {
         foreach ($this->getKeys() as $key => $info) {
-            if (!is_array($info)) {
-                $info = [
-                    'comparer' => null,
-                    'default' => $info,
-                    'direction' => 1,
-                ];
-            } else {
-                $info += [
-                    'comparer' => null,
-                    'default' => null,
-                    'direction' => 1,
-                ];
-            }
-
-            $aValue = $a instanceof \ArrayAccess ?
-                ($a->offsetExists($key) ? $a[$key] : $info['default'])
-                : (array_key_exists($key, $a) ? $a[$key] : $info['default']);
-
-            $bValue = $b instanceof \ArrayAccess ?
-                ($b->offsetExists($key) ? $b[$key] : $info['default'])
-                : (array_key_exists($key, $b) ? $b[$key] : $info['default']);
+            $info = $this->normalizeInfo($info);
+            $aValue = $this->fetchValue($a, $key, $info);
+            $bValue = $this->fetchValue($b, $key, $info);
 
             $comparer = $info['comparer'] ?? $this->getDefaultComparer($aValue, $bValue);
             $this->result = $comparer ? $comparer($aValue, $bValue) : $aValue <=> $bValue;
@@ -67,6 +49,30 @@ class ArrayValueComparer extends BaseComparer
         }
 
         return $this;
+    }
+
+    protected function normalizeInfo($info): array
+    {
+        if (!is_array($info)) {
+            return [
+                'comparer' => null,
+                'default' => $info,
+                'direction' => 1,
+            ];
+        }
+
+        return $info + [
+            'comparer' => null,
+            'default' => null,
+            'direction' => 1,
+        ];
+    }
+
+    protected function fetchValue($item, $key, $info)
+    {
+        return $item instanceof \ArrayAccess ?
+            ($item->offsetExists($key) ? $item[$key] : $info['default'])
+            : (array_key_exists($key, $item) ? $item[$key] : $info['default']);
     }
 
     protected function getDefaultComparer($a, $b): ?callable
