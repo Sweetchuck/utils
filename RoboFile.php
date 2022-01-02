@@ -4,6 +4,11 @@ declare(strict_types = 1);
 
 use Consolidation\AnnotatedCommand\CommandData;
 use League\Container\Container as LeagueContainer;
+use NuvoleWeb\Robo\Task\Config\loadTasks as ConfigLoader;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
+use Robo\Common\ConfigAwareTrait;
+use Robo\Contract\ConfigAwareInterface;
 use Robo\Tasks;
 use Robo\Collection\CollectionBuilder;
 use Sweetchuck\LintReport\Reporter\BaseReporter;
@@ -17,11 +22,14 @@ use Symfony\Component\Process\Process;
 use Symfony\Component\Yaml\Yaml;
 use Webmozart\PathUtil\Path;
 
-class RoboFile extends Tasks
+class RoboFile extends Tasks implements LoggerAwareInterface, ConfigAwareInterface
 {
+    use LoggerAwareTrait;
+    use ConfigAwareTrait;
     use GitTaskLoader;
     use PhpcsTaskLoader;
     use PhpmdTaskLoader;
+    use ConfigLoader;
 
     protected array $composerInfo = [];
 
@@ -43,7 +51,7 @@ class RoboFile extends Tasks
     protected string $envVarNamePrefix = '';
 
     /**
-     * Allowed values: dev, ci, prod.
+     * Allowed values: local, dev, ci, prod.
      */
     protected string $environmentType = '';
 
@@ -57,6 +65,7 @@ class RoboFile extends Tasks
      */
     public function __construct()
     {
+        putenv('COMPOSER_DISABLE_XDEBUG_WARN=1');
         $this
             ->initComposerInfo()
             ->initEnvVarNamePrefix()
@@ -84,6 +93,10 @@ class RoboFile extends Tasks
     /**
      * Git "pre-commit" hook callback.
      *
+     * @command githook:pre-commit
+     *
+     * @hidden
+     *
      * @initLintReporters
      */
     public function githookPreCommit(): CollectionBuilder
@@ -98,7 +111,41 @@ class RoboFile extends Tasks
     }
 
     /**
+     * @hook validate test
+     */
+    public function inputSuitNamesValidateOptionalArg(CommandData $commandData)
+    {
+        $args = $commandData->arguments();
+        $this->validateArgCodeceptionSuiteNames($args['suiteNames']);
+    }
+
+    /**
+     * @command config
+     */
+    public function cmdConfigExecute()
+    {
+        $this->output()->write(Yaml::dump($this->getConfig()->export(), 99));
+    }
+
+    /**
+     * Run the Robo unit tests.
+     *
+     * @command test
+     */
+    public function test(
+        array $suiteNames,
+        array $options = [
+            'debug' => false,
+            'php-executable' => 'coverage_reporter_xdebug',
+        ]
+    ): CollectionBuilder {
+        return $this->getTaskCodeceptRunSuites($suiteNames, $options);
+    }
+
+    /**
      * Run code style checkers.
+     *
+     * @command lint
      *
      * @initLintReporters
      */
@@ -111,14 +158,10 @@ class RoboFile extends Tasks
     }
 
     /**
-     * @initLintReporters
-     */
-    public function lintComposer()
-    {
-        return $this->taskComposerValidate();
-    }
-
-    /**
+     * Runs phpcs.
+     *
+     * @command lint:phpcs
+     *
      * @initLintReporters
      */
     public function lintPhpcs(): CollectionBuilder
@@ -127,32 +170,15 @@ class RoboFile extends Tasks
     }
 
     /**
+     * Runs phpcs.
+     *
+     * @command lint:phpmd
+     *
      * @initLintReporters
      */
     public function lintPhpmd(): CollectionBuilder
     {
         return $this->getTaskPhpmdLint();
-    }
-
-    /**
-     * @hook validate test
-     */
-    public function inputSuitNamesValidateOptionalArg(CommandData $commandData)
-    {
-        $args = $commandData->arguments();
-        $this->validateArgCodeceptionSuiteNames($args['suiteNames']);
-    }
-
-    /**
-     * Run the Robo unit tests.
-     */
-    public function test(
-        array $suiteNames,
-        array $options = [
-            'debug' => false,
-        ]
-    ): CollectionBuilder {
-        return $this->getTaskCodeceptRunSuites($suiteNames, $options);
     }
 
     protected function errorOutput(): ?OutputInterface
@@ -218,14 +244,29 @@ class RoboFile extends Tasks
         return "{$this->envVarNamePrefix}_" . strtoupper($name);
     }
 
-    protected function getPhpExecutable(): string
+    protected function getPhpExecutable($key): array
     {
-        return getenv($this->getEnvVarName('php_executable')) ?: PHP_BINARY;
-    }
+        $executables = $this->getConfig()->get('php.executables');
+        $definition = array_replace_recursive(
+            [
+                'envVars' => [],
+                'binary' => 'php',
+                'args' => [],
+            ],
+            $executables[$key] ?? [],
+        );
 
-    protected function getPhpdbgExecutable(): string
-    {
-        return getenv($this->getEnvVarName('phpdbg_executable')) ?: Path::join(PHP_BINDIR, 'phpdbg');
+        $argFilter = function ($value) {
+            return !empty($value['enabled']);
+        };
+        $argComparer = function (array $a, array $b) {
+            return ($a['weight'] ?? 99) <=> ($b['weight'] ?? 99);
+        };
+        $definition['envVars'] = array_filter($definition['envVars']);
+        $definition['args'] = array_filter($definition['args'], $argFilter);
+        uasort($definition['args'], $argComparer);
+
+        return $definition;
     }
 
     /**
@@ -233,11 +274,12 @@ class RoboFile extends Tasks
      */
     protected function initComposerInfo()
     {
-        if ($this->composerInfo || !is_readable('composer.json')) {
+        $composerFileName = getenv('COMPOSER') ?: 'composer.json';
+        if ($this->composerInfo || !is_readable($composerFileName)) {
             return $this;
         }
 
-        $this->composerInfo = json_decode(file_get_contents('composer.json'), true);
+        $this->composerInfo = json_decode(file_get_contents($composerFileName), true);
         [$this->packageVendor, $this->packageName] = explode('/', $this->composerInfo['name']);
 
         if (!empty($this->composerInfo['config']['bin-dir'])) {
@@ -262,7 +304,7 @@ class RoboFile extends Tasks
             $this->codeceptionInfo = [
                 'paths' => [
                     'tests' => 'tests',
-                    'log' => 'tests/_output',
+                    'log' => 'tests/_log',
                 ],
             ];
         }
@@ -286,38 +328,46 @@ class RoboFile extends Tasks
 
     protected function getTaskCodeceptRunSuite(string $suite, array $options = []): CollectionBuilder
     {
+        $options = array_replace_recursive(
+            [
+                'php-executable' => 'coverage_reporter_xdebug',
+            ],
+            $options,
+        );
+
         $this->initCodeceptionInfo();
 
-        $withCoverageHtml = $this->environmentType == 'dev';
-        $withCoverageXml = $this->environmentType == 'ci';
+        $withCoverageHtml = $this->environmentType === 'dev';
+        $withCoverageXml = $this->environmentType === 'ci';
 
-        $withUnitReportHtml = $this->environmentType == 'dev';
-        $withUnitReportXml = $this->environmentType == 'ci';
+        $withUnitReportHtml = $this->environmentType === 'dev';
+        $withUnitReportXml = $this->environmentType === 'ci';
 
         $logDir = $this->getLogDir();
 
-        $cmdArgs = [];
-        if ($this->isPhpDbgAvailable()) {
-            $cmdPattern = '%s -qrr';
-            $cmdArgs[] = escapeshellcmd($this->getPhpdbgExecutable());
-        } else {
-            $cmdPattern = '%s';
-            $cmdArgs[] = escapeshellcmd($this->getPhpExecutable());
+        $cmd = [];
+
+        $php = $this->getPhpExecutable($options['php-executable']);
+        foreach ($php['envVars'] as $name => $value) {
+            $cmd[] = sprintf('%s=%s', $name, $value);
+        }
+        $cmd[] = escapeshellcmd($php['binary']);
+        foreach ($php['args'] as $argDef) {
+            ksort($argDef['args']);
+            $cmd = array_merge($cmd, $argDef['args']);
         }
 
-        $cmdPattern .= ' %s';
-        $cmdArgs[] = escapeshellcmd("{$this->binDir}/codecept");
+        $cmd[] = "{$this->binDir}/codecept";
 
-        $cmdPattern .= ' --ansi';
-        $cmdPattern .= ' --verbose';
+        $cmd[] = '--ansi';
+        $cmd[] = '--verbose';
         if (!empty($options['debug'])) {
-            $cmdPattern .= ' --debug';
+            $cmd[] = '--debug';
         }
 
         $cb = $this->collectionBuilder();
         if ($withCoverageHtml) {
-            $cmdPattern .= ' --coverage-html=%s';
-            $cmdArgs[] = escapeshellarg("human/coverage/$suite/html");
+            $cmd[] = "--coverage-html=human/coverage/$suite/html";
 
             $cb->addTask(
                 $this
@@ -327,13 +377,11 @@ class RoboFile extends Tasks
         }
 
         if ($withCoverageXml) {
-            $cmdPattern .= ' --coverage-xml=%s';
-            $cmdArgs[] = escapeshellarg("machine/coverage/$suite/coverage.xml");
+            $cmd[] = "--coverage-xml=machine/coverage/$suite/coverage.xml";
         }
 
         if ($withCoverageHtml || $withCoverageXml) {
-            $cmdPattern .= ' --coverage=%s';
-            $cmdArgs[] = escapeshellarg("machine/coverage/$suite/coverage.php");
+            $cmd[] = "--coverage=machine/coverage/$suite/coverage.php";
 
             $cb->addTask(
                 $this
@@ -343,8 +391,7 @@ class RoboFile extends Tasks
         }
 
         if ($withUnitReportHtml) {
-            $cmdPattern .= ' --html=%s';
-            $cmdArgs[] = escapeshellarg("human/junit/junit.$suite.html");
+            $cmd[] = "--html=human/junit/junit.$suite.html";
 
             $cb->addTask(
                 $this
@@ -357,8 +404,7 @@ class RoboFile extends Tasks
             $jUnitFilePath = "machine/junit/junit.$suite.xml";
             $dirToCreate = Path::getDirectory("$logDir/$jUnitFilePath");
 
-            $cmdPattern .= ' --xml=%s';
-            $cmdArgs[] = escapeshellarg($jUnitFilePath);
+            $cmd[] = "--xml=$jUnitFilePath";
 
             $cb->addTask(
                 $this
@@ -367,18 +413,22 @@ class RoboFile extends Tasks
             );
         }
 
-        $cmdPattern .= ' run';
+        $cmd[] = 'run';
         if ($suite !== 'all') {
-            $cmdPattern .= ' %s';
-            $cmdArgs[] = escapeshellarg($suite);
+            $cmd[] = $suite;
         }
 
         if ($this->environmentType === 'ci' && $this->environmentName === 'jenkins') {
             // Jenkins has to use a post-build action to mark the build "unstable".
-            $cmdPattern .= ' || [[ "${?}" == "1" ]]';
+            $cmd[] = '||';
+            $cmd[] = '[[ "${?}" == "1" ]]';
         }
 
-        $command = vsprintf($cmdPattern, $cmdArgs);
+        $command = [
+            getenv('SHELL') ?: 'bash',
+            '-c',
+            implode(' ', $cmd),
+        ];
 
         return $cb
             ->addCode(function () use ($command) {
@@ -386,10 +436,11 @@ class RoboFile extends Tasks
                     '<question>[{name}]</question> runs <info>{command}</info>',
                     [
                         '{name}' => 'Codeception',
-                        '{command}' => $command,
+                        '{command}' => $command[2],
                     ]
                 ));
-                $process = Process::fromShellCommandline($command, null, null, null, null);
+
+                $process = new Process($command);
 
                 return $process->run(function ($type, $data) {
                     switch ($type) {
@@ -419,7 +470,7 @@ class RoboFile extends Tasks
             $options['lintReporters']['lintCheckstyleReporter'] = $this
                 ->getContainer()
                 ->get('lintCheckstyleReporter')
-                ->setDestination('tests/_output/machine/checkstyle/phpcs.psr2.xml');
+                ->setDestination('tests/_log/machine/checkstyle/phpcs.psr2.xml');
         }
 
         if ($this->gitHook === 'pre-commit') {
@@ -466,7 +517,7 @@ class RoboFile extends Tasks
 
         return !empty($this->codeceptionInfo['paths']['log']) ?
             $this->codeceptionInfo['paths']['log']
-            : 'tests/_output';
+            : 'tests/_log';
     }
 
     protected function getCodeceptionSuiteNames(): array
@@ -477,8 +528,8 @@ class RoboFile extends Tasks
             $suiteFiles = Finder::create()
                 ->in($this->codeceptionInfo['paths']['tests'])
                 ->files()
-                ->name('*.suite.yml')
                 ->name('*.suite.dist.yml')
+                ->name('*.suite.yml')
                 ->depth(0);
 
             foreach ($suiteFiles as $suiteFile) {
