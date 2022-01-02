@@ -171,6 +171,7 @@ REGEXP;
     /**
      * {@inheritdoc}
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
         $data = [];
