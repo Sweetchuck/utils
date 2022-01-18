@@ -5,6 +5,8 @@ declare(strict_types = 1);
 namespace Sweetchuck\Utils\Tests\Unit;
 
 use Codeception\Test\Unit;
+use PHPUnit\Framework\Exception as PHPUnitException;
+use Sweetchuck\Utils\Test\UnitTester;
 use Sweetchuck\Utils\VersionNumber;
 
 /**
@@ -13,10 +15,33 @@ use Sweetchuck\Utils\VersionNumber;
 class VersionNumberTest extends Unit
 {
 
-    /**
-     * @var \Sweetchuck\Utils\Test\UnitTester
-     */
-    protected $tester;
+    protected UnitTester $tester;
+
+    public function testMagicGet()
+    {
+        $version = VersionNumber::createFromString('1.2.3-beta4+foo');
+
+        $this->tester->assertFalse(isset($version->formatNOPE));
+        $this->tester->assertTrue(isset($version->formatMA0DMI0));
+
+        $this->tester->assertSame('010203', $version->formatMA2MI2P2);
+
+        try {
+            $this->tester->assertIsString($version->formatNOPE);
+            $this->fail('Where is the exception?');
+        } catch (PHPUnitException $e) {
+            $this->tester->assertSame(1024, $e->getCode());
+            $this->tester->assertRegExp(
+                implode(' ', [
+                    '@^Undefined property via __get\(\): formatNOPE',
+                    'in .+?/tests/unit/VersionNumberTest\.php',
+                    'on line \d+',
+                    'at src/VersionNumber\.php:\d+$@',
+                ]),
+                $e->getMessage(),
+            );
+        }
+    }
 
     public function casesTransformation(): array
     {
