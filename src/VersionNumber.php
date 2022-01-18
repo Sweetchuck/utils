@@ -6,6 +6,15 @@ namespace Sweetchuck\Utils;
 
 /**
  * @link https://semver.org/
+ *
+ * @property-read string $formatMA0DMI0
+ * @property-read string $formatMA0DMI0DP0
+ * @property-read string $formatMA0DMI0DP0R
+ * @property-read string $formatMA0MI2
+ * @property-read string $formatMA0MI2P2
+ * @property-read string $formatMA2
+ * @property-read string $formatMA2MI2
+ * @property-read string $formatMA2MI2P2
  */
 class VersionNumber implements \JsonSerializable
 {
@@ -166,6 +175,38 @@ REGEXP;
         }
 
         return $version;
+    }
+
+    public function __isset($name)
+    {
+        $constantName = $this->magicFormatPropertyNameToConstantName($name);
+
+        return $constantName && defined($constantName);
+    }
+
+    public function __get($name)
+    {
+        $constantName = $this->magicFormatPropertyNameToConstantName($name);
+        if ($constantName === null || !defined($constantName)) {
+            $trace = debug_backtrace();
+            trigger_error(
+                "Undefined property via __get(): $name in {$trace[0]['file']} on line {$trace[0]['line']}",
+                E_USER_NOTICE,
+            );
+
+            return null;
+        }
+
+        return $this->format(constant($constantName));
+    }
+
+    protected function magicFormatPropertyNameToConstantName(string $propertyName): ?string
+    {
+        $constantName = preg_replace('/^format/', 'FORMAT_', $propertyName);
+
+        return strpos($constantName, 'FORMAT_') === 0 ?
+            static::class . "::$constantName"
+            : null;
     }
 
     /**
