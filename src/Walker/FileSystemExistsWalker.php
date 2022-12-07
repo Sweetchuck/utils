@@ -5,7 +5,7 @@ declare(strict_types = 1);
 namespace Sweetchuck\Utils\Walker;
 
 use Symfony\Component\Filesystem\Filesystem;
-use Webmozart\PathUtil\Path;
+use Symfony\Component\Filesystem\Path;
 
 class FileSystemExistsWalker
 {

@@ -7,7 +7,7 @@ namespace Sweetchuck\Utils\Tests\Unit;
 use Codeception\Test\Unit;
 use org\bovigo\vfs\vfsStream;
 use Sweetchuck\Utils\Filesystem;
-use Webmozart\PathUtil\Path;
+use Symfony\Component\Filesystem\Path;
 
 /**
  * @covers \Sweetchuck\Utils\Filesystem

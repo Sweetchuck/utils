@@ -97,7 +97,7 @@ commands:
                 run:
                     name: 'Codeception - unit'
                     command: |
-                        "./$(composer config bin-dir)/robo" test --php-executable='coverage_reporter_pcov' unit
+                        "./$(composer config bin-dir)/robo" test unit
             -
                 codecov/upload:
                     flags: 'unit'

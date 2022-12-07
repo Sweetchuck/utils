@@ -42,8 +42,7 @@
     "require": {
         "php": ">=7.4",
         "ext-json": "*",
-        "symfony/filesystem": "^4.1 || ^5.0",
-        "webmozart/path-util": "^2.3"
+        "symfony/filesystem": "^4.1 || ^5.0 || ^6.0"
     },
     "require-dev": {
         "codeception/codeception": "^4.0",

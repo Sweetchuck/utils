@@ -20,7 +20,7 @@
         <properties>
             <property
                 name="exceptions"
-                value="\Sweetchuck\Utils\Filesystem,\Sweetchuck\Utils\StringFormat,\Sweetchuck\Utils\VersionNumber,\Webmozart\PathUtil\Path,\org\bovigo\vfs\vfsStream"
+                value="\Sweetchuck\Utils\Filesystem,\Sweetchuck\Utils\StringFormat,\Sweetchuck\Utils\VersionNumber,\org\bovigo\vfs\vfsStream"
                 description="Comma-separated class name list of exceptions"/>
         </properties>
     </rule>
