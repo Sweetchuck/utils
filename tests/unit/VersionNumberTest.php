@@ -32,11 +32,11 @@ class VersionNumberTest extends Unit
         } catch (PHPUnitException $e) {
             $this->tester->assertSame(1024, $e->getCode());
             $this->tester->assertRegExp(
+                // This error message differs in different PHP versions.
                 implode(' ', [
                     '@^Undefined property via __get\(\): formatNOPE',
                     'in .+?/tests/unit/VersionNumberTest\.php',
-                    'on line \d+',
-                    'at src/VersionNumber\.php:\d+$@',
+                    'on line \d+\b@',
                 ]),
                 $e->getMessage(),
             );
