@@ -87,6 +87,15 @@ class UriTest extends Unit
                 ],
                 'hidden',
             ],
+            'path without leading slash' => [
+                'https://a.com/foo',
+                [
+                    'scheme' => 'https',
+                    'host' => 'a.com',
+                    'path' => 'foo',
+                ],
+                'raw',
+            ],
         ];
     }
 

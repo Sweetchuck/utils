@@ -44,6 +44,10 @@ class Uri
         }
 
         if (isset($parts['path']) && $parts['path'] !== '') {
+            if (substr($parts['path'], 0, 1) !== '/') {
+                $uri .= '/';
+            }
+
             $uri .= $parts['path'];
         }
 
