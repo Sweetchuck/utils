@@ -5,6 +5,8 @@ declare(strict_types = 1);
 namespace Sweetchuck\Utils;
 
 /**
+ * @phpstan-import-type VersionNumberParts from \Sweetchuck\Utils\Phpstan
+ *
  * @link https://semver.org/
  *
  * @property-read string $formatMA0DMI0
@@ -18,6 +20,10 @@ namespace Sweetchuck\Utils;
  */
 class VersionNumber implements \JsonSerializable
 {
+    /**
+     * WARNING: This allows non-numeric values as well.
+     * For example: "a.b" or "1.x".
+     */
     const VERSION_PARSER_REGEX = <<<'REGEXP'
 /^
   (?P<major>[^.+-]+)
@@ -74,6 +80,9 @@ REGEXP;
      */
     const FORMAT_MA2MI2P2 = '%{major.02d}%{minor.02d}%{patch.02d}';
 
+    /**
+     * @var string[]
+     */
     protected static array $propertyMapping = [
         'major' => 'major',
         'minor' => 'minor',
@@ -84,6 +93,9 @@ REGEXP;
         'metadata' => 'metadata',
     ];
 
+    /**
+     * @var string[]
+     */
     protected static array $defaultValues = [
         'major' => '',
         'minor' => '',
@@ -91,6 +103,14 @@ REGEXP;
         'preRelease' => '',
         'metadata' => '',
     ];
+
+    /**
+     * @return string[]
+     */
+    public static function getFragmentNames(): array
+    {
+        return array_keys(static::$defaultValues);
+    }
 
     public string $major = '';
 
@@ -103,10 +123,13 @@ REGEXP;
     public string $metadata = '';
 
     /**
+     * @phpstan-param VersionNumberParts $parts
+     *
      * @return static
      */
     public static function __set_state(array $parts)
     {
+        // @phpstan-ignore-next-line new.static
         $instance = new static();
         $instance->major = (string) ($parts['major'] ?? $parts[0] ?? '');
         $instance->minor = (string) ($parts['minor'] ?? $parts[1] ?? '');
@@ -117,14 +140,14 @@ REGEXP;
         return $instance;
     }
 
-    /**
-     * @return static
-     */
-    public static function createFromString(string $version)
+    public static function createFromString(string $version): static
     {
         return static::__set_state(static::explode($version));
     }
 
+    /**
+     * @phpstan-return VersionNumberParts
+     */
     public static function explode(string $version): array
     {
         $matches = [];
@@ -135,7 +158,7 @@ REGEXP;
             function ($key) {
                 return !is_numeric($key);
             },
-            ARRAY_FILTER_USE_KEY
+            ARRAY_FILTER_USE_KEY,
         );
     }
 
@@ -144,6 +167,9 @@ REGEXP;
         return preg_match(static::VERSION_PARSER_REGEX, $version) === 1;
     }
 
+    /**
+     * @return null|mixed[]
+     */
     public static function parsePreRelease(string $preRelease): ?array
     {
         $matches = [];
@@ -154,6 +180,26 @@ REGEXP;
                 'number' => (int) $matches['number'],
             ]
             : null;
+    }
+
+    public static function assertFragmentName(string $name): void
+    {
+        if (isset(static::$propertyMapping[$name])) {
+            return;
+        }
+
+        throw new \InvalidArgumentException(sprintf(
+            'invalid fragment name: "%s" allowed values: %s',
+            $name,
+            implode(', ', array_keys(static::$propertyMapping)),
+        ));
+    }
+
+    protected StringUtils $stringUtils;
+
+    public function __construct(?StringUtils $stringUtils = null)
+    {
+        $this->stringUtils = $stringUtils ?: new StringUtils();
     }
 
     public function __toString()
@@ -177,6 +223,11 @@ REGEXP;
         return $version;
     }
 
+    /**
+     * @param string $name
+     *
+     * @return bool
+     */
     public function __isset($name)
     {
         $constantName = $this->magicFormatPropertyNameToConstantName($name);
@@ -184,15 +235,22 @@ REGEXP;
         return $constantName && defined($constantName);
     }
 
+    /**
+     * @param string $name
+     *
+     * @return mixed
+     */
     public function __get($name)
     {
         $constantName = $this->magicFormatPropertyNameToConstantName($name);
         if ($constantName === null || !defined($constantName)) {
             $trace = debug_backtrace();
-            trigger_error(
-                "Undefined property via __get(): $name in {$trace[0]['file']} on line {$trace[0]['line']}",
-                E_USER_NOTICE,
-            );
+            trigger_error(sprintf(
+                'Undefined property via __get(): %s in %s on line %s',
+                $name,
+                $trace[0]['file'] ?? 'unknown://nowhere.txt',
+                $trace[0]['line'] ?? '0',
+            ));
 
             return null;
         }
@@ -204,16 +262,15 @@ REGEXP;
     {
         $constantName = preg_replace('/^format/', 'FORMAT_', $propertyName);
 
-        return strpos($constantName, 'FORMAT_') === 0 ?
+        return str_starts_with($constantName, 'FORMAT_') ?
             static::class . "::$constantName"
             : null;
     }
 
     /**
-     * {@inheritdoc}
+     * @phpstan-return VersionNumberParts
      */
-    #[\ReturnTypeWillChange]
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         $data = [];
         foreach (array_unique(static::$propertyMapping) as $name) {
@@ -228,30 +285,22 @@ REGEXP;
 
     public function get(string $name): string
     {
-        $this->assertFragmentName($name);
+        static::assertFragmentName($name);
 
         return $this->{static::$propertyMapping[$name]};
     }
 
-    /**
-     * @return $this
-     */
-    public function set(string $name, string $value)
+    public function set(string $name, string $value): static
     {
-        $this->assertFragmentName($name);
+        static::assertFragmentName($name);
         $this->{static::$propertyMapping[$name]} = $value;
 
         return $this;
     }
 
-    /**
-     * @return $this
-     *
-     * @noinspection PhpMissingBreakStatementInspection
-     */
-    public function reset(string $fragment = 'major')
+    public function reset(string $fragment = 'major'): static
     {
-        $this->assertFragmentName($fragment);
+        static::assertFragmentName($fragment);
         switch ($fragment) {
             case 'major':
                 $this->major = '';
@@ -286,20 +335,20 @@ REGEXP;
         );
     }
 
+    /**
+     * @phpstan-param array<string, mixed> $args
+     */
     public function format(string $format, array $args = []): string
     {
-        return StringFormat::vsprintf(
+        return $this->stringUtils->vsprintf(
             $format,
             $this->jsonSerialize() + static::$defaultValues + $args,
         );
     }
 
-    /**
-     * @return $this
-     */
-    public function bump(string $fragment, int $amount = 1)
+    public function bump(string $fragment, int $amount = 1): static
     {
-        $this->assertFragmentName($fragment);
+        static::assertFragmentName($fragment);
         if ($amount === 0) {
             return $this;
         }
@@ -315,12 +364,7 @@ REGEXP;
         return $this;
     }
 
-    /**
-     * @return $this
-     *
-     * @noinspection PhpMissingBreakStatementInspection
-     */
-    protected function bumpReset(string $fragment)
+    protected function bumpReset(string $fragment): static
     {
         switch ($fragment) {
             case 'major':
@@ -339,16 +383,13 @@ REGEXP;
                 break;
 
             default:
-                throw new \UnexpectedValueException('@todo Not implemented yet', 1);
+                throw new \UnexpectedValueException("@todo Not implemented yet; fragment: $fragment", 1);
         }
 
         return $this;
     }
 
-    /**
-     * @return $this
-     */
-    protected function bumpIncrease(string $fragment, int $amount)
+    protected function bumpIncrease(string $fragment, int $amount): static
     {
         switch ($fragment) {
             case 'major':
@@ -375,7 +416,7 @@ REGEXP;
 
                 $parts = static::parsePreRelease($this->preRelease);
                 if ($parts) {
-                    $this->preRelease = StringFormat::vsprintf(
+                    $this->preRelease = $this->stringUtils->vsprintf(
                         static::FORMAT_PRE_RELEASE,
                         [
                             'type' => $parts['type'],
@@ -391,9 +432,9 @@ REGEXP;
     }
 
     /**
-     * @param static $other
+     * @phpstan-return array<string, mixed>
      */
-    public function diff($other): array
+    public function diff(self $other): array
     {
         $diff = [
             'spaceship' => version_compare(
@@ -433,18 +474,5 @@ REGEXP;
         }
 
         return $diff;
-    }
-
-    protected function assertFragmentName(string $name)
-    {
-        if (isset(static::$propertyMapping[$name])) {
-            return $this;
-        }
-
-        throw new \InvalidArgumentException(sprintf(
-            'invalid fragment name: "%s" allowed values: %s',
-            $name,
-            implode(', ', array_keys(static::$propertyMapping)),
-        ));
     }
 }

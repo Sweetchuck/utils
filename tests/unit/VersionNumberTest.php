@@ -4,20 +4,16 @@ declare(strict_types = 1);
 
 namespace Sweetchuck\Utils\Tests\Unit;
 
-use Codeception\Test\Unit;
-use PHPUnit\Framework\Exception as PHPUnitException;
-use Sweetchuck\Utils\Test\UnitTester;
+use Codeception\Attribute\DataProvider;
 use Sweetchuck\Utils\VersionNumber;
 
 /**
  * @covers \Sweetchuck\Utils\VersionNumber
  */
-class VersionNumberTest extends Unit
+class VersionNumberTest extends TestBase
 {
 
-    protected UnitTester $tester;
-
-    public function testMagicGet()
+    public function testMagicGet(): void
     {
         $version = VersionNumber::createFromString('1.2.3-beta4+foo');
 
@@ -27,9 +23,10 @@ class VersionNumberTest extends Unit
         $this->tester->assertSame('010203', $version->formatMA2MI2P2);
 
         try {
+            // @phpstan-ignore-next-line property.notFound
             $this->tester->assertIsString($version->formatNOPE);
             $this->fail('Where is the exception?');
-        } catch (PHPUnitException $e) {
+        } catch (\Codeception\Exception\Notice $e) {
             $this->tester->assertSame(1024, $e->getCode());
             $this->tester->assertRegExp(
                 // This error message differs in different PHP versions.
@@ -43,7 +40,10 @@ class VersionNumberTest extends Unit
         }
     }
 
-    public function casesTransformation(): array
+    /**
+     * @return mixed[]
+     */
+    public static function casesTransformation(): array
     {
         return [
             'major' => [
@@ -145,10 +145,13 @@ class VersionNumberTest extends Unit
         ];
     }
 
-    public function casesCreateFromString(): array
+    /**
+     * @return mixed[]
+     */
+    public static function casesCreateFromString(): array
     {
         $cases = [];
-        foreach ($this->casesTransformation() as $key => $case) {
+        foreach (static::casesTransformation() as $key => $case) {
             $cases[$key] = [
                 $case['array'],
                 $case['string'],
@@ -159,18 +162,23 @@ class VersionNumberTest extends Unit
     }
 
     /**
-     * @dataProvider casesCreateFromString
+     * @param mixed[] $expected
+     * @param string $version
      */
-    public function testCreateFromString(array $expected, string $version)
+    #[DataProvider('casesCreateFromString')]
+    public function testCreateFromString(array $expected, string $version): void
     {
         $instance = VersionNumber::createFromString($version);
         $this->tester->assertSame($expected, $instance->jsonSerialize());
     }
 
-    public function casesToString(): array
+    /**
+     * @return mixed[]
+     */
+    public static function casesToString(): array
     {
         $cases = [];
-        foreach ($this->casesTransformation() as $key => $case) {
+        foreach (static::casesTransformation() as $key => $case) {
             $cases[$key] = [
                 $case['string'],
                 $case['array'],
@@ -181,15 +189,19 @@ class VersionNumberTest extends Unit
     }
 
     /**
-     * @dataProvider casesToString
+     * @param mixed[] $values
      */
+    #[DataProvider('casesToString')]
     public function testToString(string $expected, array $values): void
     {
         $instance = VersionNumber::__set_state($values);
         $this->tester->assertSame($expected, (string)$instance);
     }
 
-    public function casesFormat(): array
+    /**
+     * @return mixed[]
+     */
+    public static function casesFormat(): array
     {
         return [
             'majorMinorZeroPadding' => [
@@ -220,19 +232,20 @@ class VersionNumberTest extends Unit
         ];
     }
 
-    /**
-     * @dataProvider casesFormat
-     */
+    #[DataProvider('casesFormat')]
     public function testFormat(
         string $expected,
         string $version,
-        string $format
+        string $format,
     ): void {
         $instance = VersionNumber::createFromString($version);
         $this->tester->assertSame($expected, $instance->format($format));
     }
 
-    public function casesFormatConstants(): array
+    /**
+     * @return mixed[]
+     */
+    public static function casesFormatConstants(): array
     {
         $version = '1.2.3-alpha1+foo';
 
@@ -275,16 +288,17 @@ class VersionNumberTest extends Unit
         ];
     }
 
-    /**
-     * @dataProvider casesFormatConstants
-     */
+    #[DataProvider('casesFormatConstants')]
     public function testFormatConstants(string $expected, string $format, string $version): void
     {
         $instance = VersionNumber::createFromString($version);
         $this->tester->assertSame($expected, $instance->format($format));
     }
 
-    public function casesIsEmpty(): array
+    /**
+     * @return mixed[]
+     */
+    public static function casesIsEmpty(): array
     {
         return [
             'empty' => [true, []],
@@ -307,15 +321,19 @@ class VersionNumberTest extends Unit
     }
 
     /**
-     * @dataProvider casesIsEmpty
+     * @param mixed[] $parts
      */
+    #[DataProvider('casesIsEmpty')]
     public function testIsEmpty(bool $expected, array $parts): void
     {
         $instance = VersionNumber::__set_state($parts);
         $this->tester->assertSame($expected, $instance->isEmpty());
     }
 
-    public function casesIsValid(): array
+    /**
+     * @return mixed[]
+     */
+    public static function casesIsValid(): array
     {
         return [
             'empty' => [false, ''],
@@ -333,15 +351,16 @@ class VersionNumberTest extends Unit
         ];
     }
 
-    /**
-     * @dataProvider casesIsValid
-     */
+    #[DataProvider('casesIsValid')]
     public function testIsValid(bool $expected, string $version): void
     {
         $this->tester->assertSame($expected, VersionNumber::isValid($version));
     }
 
-    public function casesParsePreRelease(): array
+    /**
+     * @return mixed[]
+     */
+    public static function casesParsePreRelease(): array
     {
         return [
             'empty' => [null, ''],
@@ -354,14 +373,18 @@ class VersionNumberTest extends Unit
     }
 
     /**
-     * @dataProvider casesParsePreRelease
+     * @param null|mixed[] $expected
      */
+    #[DataProvider('casesParsePreRelease')]
     public function testParsePreRelease(?array $expected, string $preRelease): void
     {
         $this->tester->assertSame($expected, VersionNumber::parsePreRelease($preRelease));
     }
 
-    public function casesBump(): array
+    /**
+     * @return mixed[]
+     */
+    public static function casesBump(): array
     {
         return [
             'major-0' => ['1.2.3-alpha4+foo', '1.2.3-alpha4+foo', 'major', 0],
@@ -378,10 +401,8 @@ class VersionNumberTest extends Unit
         ];
     }
 
-    /**
-     * @dataProvider casesBump
-     */
-    public function testBump(string $expected, string $version, $fragment, int $amount): void
+    #[DataProvider('casesBump')]
+    public function testBump(string $expected, string $version, string $fragment, int $amount): void
     {
         $instance = VersionNumber::createFromString($version);
         $this->tester->assertSame($expected, (string) $instance->bump($fragment, $amount));
@@ -420,7 +441,7 @@ class VersionNumberTest extends Unit
         );
     }
 
-    public function testGetSetRest(): void
+    public function testGetSetReset(): void
     {
         $instance = VersionNumber::createFromString('1.2.3-alpha4+foo');
         $this->tester->assertSame('1', $instance->get('major'));
@@ -454,7 +475,10 @@ class VersionNumberTest extends Unit
         $this->tester->assertSame('1.2.3-beta1+baz', (string) $instance);
     }
 
-    public function casesDiff(): array
+    /**
+     * @return mixed[]
+     */
+    public static function casesDiff(): array
     {
         return [
             'same' => [
@@ -536,8 +560,9 @@ class VersionNumberTest extends Unit
     }
 
     /**
-     * @dataProvider casesDiff
+     * @param mixed[] $expected
      */
+    #[DataProvider('casesDiff')]
     public function testDiff(array $expected, string $aVersion, string $bVersion): void
     {
         $a = VersionNumber::createFromString($aVersion);

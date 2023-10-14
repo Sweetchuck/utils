@@ -7,7 +7,14 @@ namespace Sweetchuck\Utils\Filter;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
 
-class ArrayFilterFileSystemExists extends ArrayFilterBase
+/**
+ * @phpstan-import-type SweetchuckUtilsFileSystemExistsFilterOptions from \Sweetchuck\Utils\Phpstan
+ *
+ * @template TItem
+ *
+ * @extends \Sweetchuck\Utils\Filter\FilterBase<TItem>
+ */
+class FileSystemExistsFilter extends FilterBase
 {
     public string $baseDir = '.';
 
@@ -16,10 +23,7 @@ class ArrayFilterFileSystemExists extends ArrayFilterBase
         return $this->baseDir;
     }
 
-    /**
-     * @return $this
-     */
-    public function setBaseDir(string $baseDir)
+    public function setBaseDir(string $baseDir): static
     {
         $this->baseDir = $baseDir;
 
@@ -27,9 +31,9 @@ class ArrayFilterFileSystemExists extends ArrayFilterBase
     }
 
     /**
-     * {@inheritdoc}
+     * @phpstan-param SweetchuckUtilsFileSystemExistsFilterOptions $options
      */
-    public function setOptions(array $options)
+    public function setOptions(array $options): static
     {
         parent::setOptions($options);
 
@@ -50,8 +54,9 @@ class ArrayFilterFileSystemExists extends ArrayFilterBase
     /**
      * {@inheritdoc}
      */
-    protected function checkDoIt($item, ?string $outerKey = null)
+    protected function setResult(mixed $item, null|int|string $outerKey = null): static
     {
+        // @todo Add support for \SplFileInfo.
         $baseDir = $this->getBaseDir();
         $scheme = parse_url($item, PHP_URL_SCHEME);
         if (!$scheme && Path::isRelative($item) && $baseDir) {

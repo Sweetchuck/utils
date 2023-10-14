@@ -1,0 +1,106 @@
+parameters:
+    typeAliases:
+        comparison-result-value: '-1|0|1|int<-1, 1>'
+        order-direction-value: '-1|1'
+        order-direction-name: '"asc"|"desc"|"ASC"|"DESC"'
+        order-direction-mixed: 'order-direction-value|"asc"|order-direction-name|\Sweetchuck\Utils\Comparer\OrderDirection'
+        sweetchuck-utils-comparer: 'callable(mixed, mixed): comparison-result-value'
+        url-parts: '''
+            array{
+                scheme?: string,
+                user?: string,
+                pass?: string,
+                host?: string,
+                port?: string|int,
+                path?: string,
+                query?: string|mixed[],
+                fragment?: string,
+            }
+        '''
+        url-password-format: '"hidden"|"placeholder"|"raw"'
+
+        version-number-parts: '''
+            array{
+                major?: ?string,
+                minor?: ?string,
+                patch?: ?string,
+                preRelease?: ?string,
+                metadata?: ?string,
+                0?: ?string,
+                1?: ?string,
+                2?: ?string,
+                3?: ?string,
+                4?: ?string,
+            }
+        '''
+
+        sweetchuck-utils-comparer-options: '''
+            array{
+                direction?: order-direction-mixed,
+            }
+        '''
+        sweetchuck-utils-comparer-chain-options: '''
+            array{
+                direction?: order-direction-mixed,
+                comparers?: array<string, sweetchuck-utils-comparer>,
+            }
+        '''
+        sweetchuck-utils-array-value-comparer-options: '''
+            array{
+                direction?: order-direction-mixed,
+                keys?: array<string, mixed>,
+            }
+        '''
+        sweetchuck-utils-predefined-comparer-options: '''
+            array{
+                direction?: order-direction-mixed,
+                weights?: array<int|float>,
+                defaultWeight?: int|float,
+            }
+        '''
+
+        sweetchuck-utils-filter-options: '''
+            array{
+                inverse?: bool,
+            }
+        '''
+        sweetchuck-utils-array-allowed-value-filter-options: '''
+            array{
+                inverse?: bool,
+                key?: array-key,
+                allowedValues?: array<mixed>,
+            }
+        '''
+        sweetchuck-utils-custom-filter-options: '''
+            array{
+                inverse?: bool,
+                value1Fetcher?: string|callable,
+                operator?: string,
+                value2Fetcher?: null|string|callable,
+            }
+        '''
+        sweetchuck-utils-enabled-filter-options: '''
+            array{
+                inverse?: bool,
+                key?: array-key,
+                defaultValue?: bool,
+                stringToBool?: array<string, bool>,
+            }
+        '''
+        sweetchuck-utils-file-system-exists-filter-options: '''
+            array{
+                inverse?: bool,
+                baseDir?: string,
+            }
+        '''
+        sweetchuck-utils-filter-group-options: '''
+            array{
+                inverse?: bool,
+                filters?: array<callable>,
+            }
+        '''
+        sweetchuck-utils-file-system-exists-walker-options: '''
+            array{
+                baseDir?: ?string,
+            }
+        '''

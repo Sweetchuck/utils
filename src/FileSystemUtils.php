@@ -6,7 +6,7 @@ namespace Sweetchuck\Utils;
 
 use Symfony\Component\Filesystem\Path;
 
-class Filesystem
+class FileSystemUtils
 {
 
     /**
@@ -20,10 +20,10 @@ class Filesystem
      *   returns the parent directory without the $fileName if the $fileName
      *   exists in one of the parent directory.
      */
-    public static function findFileUpward(
+    public function findFileUpward(
         string $fileName,
         string $currentDir,
-        ?string $rootDir = null
+        ?string $rootDir = null,
     ): ?string {
         if ($rootDir !== null && !static::isParentDirOrSame($rootDir, $currentDir)) {
             throw new \InvalidArgumentException("The '$rootDir' is not parent dir of '$currentDir'");
@@ -45,7 +45,7 @@ class Filesystem
         return null;
     }
 
-    public static function isParentDirOrSame(string $parentDir, string $childDir): bool
+    public function isParentDirOrSame(string $parentDir, string $childDir): bool
     {
         # @todo Handle a/./b and a/../c formats.
         if ($parentDir === '.') {
@@ -63,7 +63,11 @@ class Filesystem
         return (bool) preg_match($pattern, $childDir);
     }
 
-    public static function fileGetContents(string $filePath): string
+    /**
+     * @throws \RuntimeException
+     *   When the $filePath is not readable.
+     */
+    public function fileGetContents(string $filePath): string
     {
         $fileContent = file_get_contents($filePath);
         if ($fileContent === false) {
@@ -73,7 +77,10 @@ class Filesystem
         return $fileContent;
     }
 
-    public static function normalizeShellFileDescriptor(string $fileName): string
+    /**
+     * In this case `php my.php <(echo 'foo')`.
+     */
+    public function normalizeShellFileDescriptor(string $fileName): string
     {
         return preg_replace(
             '@^/proc/self/fd/(?P<id>\d+)$@',

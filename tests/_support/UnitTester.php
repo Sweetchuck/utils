@@ -1,5 +1,8 @@
 <?php
-namespace Sweetchuck\Utils\Test;
+
+namespace Sweetchuck\Utils\Tests;
+
+use Codeception\Actor;
 
 /**
  * Inherited Methods
@@ -16,7 +19,7 @@ namespace Sweetchuck\Utils\Test;
  *
  * @SuppressWarnings(PHPMD)
 */
-class UnitTester extends \Codeception\Actor
+class UnitTester extends Actor
 {
     use _generated\UnitTesterActions;
 

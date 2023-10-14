@@ -23,36 +23,6 @@ executors:
         docker:
             -
                 name: 'main'
-                image: 'cimg/php:7.4'
-    php_plus1:
-        resource_class: 'small'
-        environment:
-            <<: *env_app
-            <<: *env_composer
-
-        docker:
-            -
-                name: 'main'
-                image: 'cimg/php:8.0'
-    php_plus2:
-        resource_class: 'small'
-        environment:
-            <<: *env_app
-            <<: *env_composer
-
-        docker:
-            -
-                name: 'main'
-                image: 'cimg/php:8.1'
-    php_plus3:
-        resource_class: 'small'
-        environment:
-            <<: *env_app
-            <<: *env_composer
-
-        docker:
-            -
-                name: 'main'
                 image: 'cimg/php:8.2'
 
 commands:
@@ -119,11 +89,11 @@ commands:
             -
                 codecov/upload:
                     flags: 'unit'
-                    file: './tests/_log/machine/coverage/unit/coverage.xml'
+                    file: './tests/_output/machine/coverage/unit/coverage.xml'
             -
                 store_test_results:
                     name: 'Store unit test results'
-                    path: './tests/_log/machine/junit'
+                    path: './tests/_output/machine/junit'
 
 jobs:
     build:
@@ -168,6 +138,3 @@ workflows:
                         parameters:
                             executor:
                                 - 'php_min'
-                                - 'php_plus1'
-                                - 'php_plus2'
-                                - 'php_plus3'

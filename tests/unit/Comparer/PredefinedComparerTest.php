@@ -4,25 +4,26 @@ declare(strict_types = 1);
 
 namespace Sweetchuck\Utils\Tests\Unit\Comparer;
 
-use Codeception\Test\Unit;
+use Codeception\Attribute\DataProvider;
 use Sweetchuck\Utils\Comparer\PredefinedComparer;
-use Sweetchuck\Utils\Test\UnitTester;
+use Sweetchuck\Utils\Tests\Unit\TestBase;
 
 /**
- * @covers \Sweetchuck\Utils\Comparer\PredefinedComparer<extended>
+ * @covers \Sweetchuck\Utils\Comparer\PredefinedComparer
+ * @covers \Sweetchuck\Utils\Comparer\ComparerBase
  */
-class PredefinedComparerTest extends Unit
+class PredefinedComparerTest extends TestBase
 {
-    protected UnitTester $tester;
-
-    public function casesCompare(): array
+    /**
+     * @return mixed[]
+     */
+    public static function casesCompare(): array
     {
         return [
             'empty' => [
                 [],
                 [],
                 [],
-                0,
             ],
             'basic' => [
                 [
@@ -38,22 +39,27 @@ class PredefinedComparerTest extends Unit
                     'c',
                 ],
                 [
-                    'a' => 1,
-                    'b' => 2,
-                    'c' => 3,
-                    'd' => 4,
+                    'weights' => [
+                        'a' => 1,
+                        'b' => 2,
+                        'c' => 3,
+                        'd' => 4,
+                    ],
                 ],
-                0,
             ],
         ];
     }
 
     /**
-     * @dataProvider casesCompare
+     * @param mixed[] $expected
+     * @param mixed[] $items
+     * @param mixed[] $options
      */
-    public function testCompare(array $expected, array $items, array $weights, int $defaultWeight)
+    #[DataProvider('casesCompare')]
+    public function testCompare(array $expected, array $items, array $options): void
     {
-        $comparer = new PredefinedComparer($weights, $defaultWeight);
+        $comparer = new PredefinedComparer();
+        $comparer->setOptions($options);
         usort($items, $comparer);
         $this->tester->assertSame($expected, $items);
     }

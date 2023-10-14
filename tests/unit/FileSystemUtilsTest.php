@@ -4,23 +4,25 @@ declare(strict_types = 1);
 
 namespace Sweetchuck\Utils\Tests\Unit;
 
-use Codeception\Test\Unit;
+use Codeception\Attribute\DataProvider;
 use org\bovigo\vfs\vfsStream;
-use Sweetchuck\Utils\Filesystem;
+use Sweetchuck\Utils\FileSystemUtils;
 use Symfony\Component\Filesystem\Path;
 
 /**
- * @covers \Sweetchuck\Utils\Filesystem
+ * @covers \Sweetchuck\Utils\FileSystemUtils
  */
-class FilesystemTest extends Unit
+class FileSystemUtilsTest extends TestBase
 {
+    protected function createInstance(): FileSystemUtils
+    {
+        return new FileSystemUtils();
+    }
 
     /**
-     * @var \Sweetchuck\Utils\Test\UnitTester
+     * @return mixed[]
      */
-    protected $tester;
-
-    public function casesFindFileUpward(): array
+    public static function casesFindFileUpward(): array
     {
         return [
             'not-exists' => [
@@ -124,14 +126,15 @@ class FilesystemTest extends Unit
     }
 
     /**
-     * @dataProvider casesFindFileUpward
+     * @param mixed[] $vfsStructure
      */
+    #[DataProvider('casesFindFileUpward')]
     public function testFindFileUpward(
         ?string $expected,
         string $fileName,
         string $currentDir,
         ?string $rootDir,
-        array $vfsStructure
+        array $vfsStructure,
     ): void {
         $vfs = vfsStream::setup(__FUNCTION__, null, $vfsStructure);
         $currentDir = Path::join($vfs->url(), $currentDir);
@@ -139,23 +142,28 @@ class FilesystemTest extends Unit
             $rootDir = Path::join($vfs->url(), $rootDir);
         }
 
+        $filesystem = $this->createInstance();
         $this->tester->assertSame(
             $expected,
-            Filesystem::findFileUpward($fileName, $currentDir, $rootDir)
+            $filesystem->findFileUpward($fileName, $currentDir, $rootDir)
         );
     }
 
-    public function testFindFileUpwardNotParent()
+    public function testFindFileUpwardNotParent(): void
     {
         $this->tester->expectThrowable(
             \InvalidArgumentException::class,
             function () {
-                Filesystem::findFileUpward('a.txt', '/a', '/b');
+                $filesystem = $this->createInstance();
+                $filesystem->findFileUpward('a.txt', '/a', '/b');
             },
         );
     }
 
-    public function casesIsParentDirOrSame(): array
+    /**
+     * @return mixed[]
+     */
+    public static function casesIsParentDirOrSame(): array
     {
         return [
             'dot dot' => [
@@ -211,18 +219,20 @@ class FilesystemTest extends Unit
         ];
     }
 
-    /**
-     * @dataProvider casesIsParentDirOrSame
-     */
+    #[DataProvider('casesIsParentDirOrSame')]
     public function testIsParentDirOrSame(bool $expected, string $parentDir, string $childDir): void
     {
+        $filesystem = $this->createInstance();
         $this->tester->assertSame(
             $expected,
-            Filesystem::isParentDirOrSame($parentDir, $childDir),
+            $filesystem->isParentDirOrSame($parentDir, $childDir),
         );
     }
 
-    public function casesNormalizeShellFileDescriptor(): array
+    /**
+     * @return mixed[]
+     */
+    public static function casesNormalizeShellFileDescriptor(): array
     {
         return [
             'empty' => [
@@ -240,14 +250,13 @@ class FilesystemTest extends Unit
         ];
     }
 
-    /**
-     * @dataProvider casesNormalizeShellFileDescriptor
-     */
+    #[DataProvider('casesNormalizeShellFileDescriptor')]
     public function testNormalizeShellFileDescriptor(string $expected, string $fileName): void
     {
+        $filesystem = $this->createInstance();
         $this->tester->assertSame(
             $expected,
-            Filesystem::normalizeShellFileDescriptor($fileName),
+            $filesystem->normalizeShellFileDescriptor($fileName),
         );
     }
 }

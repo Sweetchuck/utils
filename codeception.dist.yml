@@ -1,11 +1,10 @@
-
-namespace: 'Sweetchuck\Utils\Test'
+namespace: 'Sweetchuck\Utils\Tests'
 
 paths:
     tests: 'tests'
     data: 'tests/_data'
     envs: 'tests/_envs'
-    log: 'tests/_log'
+    output: 'tests/_output'
     support: 'tests/_support'
 
 settings:

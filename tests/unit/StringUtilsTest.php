@@ -4,21 +4,72 @@ declare(strict_types = 1);
 
 namespace Sweetchuck\Utils\Tests\Unit;
 
-use Codeception\Test\Unit;
-use Sweetchuck\Utils\Uri;
+use Codeception\Attribute\DataProvider;
+use Sweetchuck\Utils\StringUtils;
 
 /**
- * @covers \Sweetchuck\Utils\Uri
+ * @phpstan-import-type UrlPasswordFormat from \Sweetchuck\Utils\Phpstan
+ *
+ * @covers \Sweetchuck\Utils\StringUtils
  */
-class UriTest extends Unit
+class StringUtilsTest extends TestBase
 {
 
     /**
-     * @var \Sweetchuck\Utils\Test\UnitTester
+     * @return mixed[]
      */
-    protected $tester;
+    public static function casesVsprintf(): array
+    {
+        return [
+            'empty args' => [
+                'foo',
+                'foo',
+            ],
+            'basic' => [
+                '%{b.s}.c',
+                '%{a.s}.%{b.s}',
+                [
+                    'a' => '%{b.s}',
+                    'b' => 'c',
+                ]
+            ],
+            'escape - 1' => [
+                '%{a.s}.value-a',
+                '%%{a.s}.%{a.s}',
+                [
+                    'a' => 'value-a',
+                ]
+            ],
+            'escape - 2' => [
+                '%value-a.value-a',
+                '%%%{a.s}.%{a.s}',
+                [
+                    'a' => 'value-a',
+                ]
+            ],
+        ];
+    }
 
-    public function casesBuild(): array
+    /**
+     * @phpstan-param array<mixed> $args
+     */
+    #[DataProvider('casesVsprintf')]
+    public function testVsprintf(
+        string $expected,
+        string $format,
+        array $args = [],
+    ): void {
+        $stringUtils = new StringUtils();
+        $this->tester->assertSame(
+            $expected,
+            $stringUtils->vsprintf($format, $args),
+        );
+    }
+
+    /**
+     * @return mixed[]
+     */
+    public static function casesBuildUri(): array
     {
         return [
             'empty' => [
@@ -100,16 +151,20 @@ class UriTest extends Unit
     }
 
     /**
-     * @dataProvider casesBuild
+     * @param mixed[] $parts
+     *
+     * @phpstan-param UrlPasswordFormat $passwordFormat
      */
-    public function testBuild(
+    #[DataProvider('casesBuildUri')]
+    public function testBuildUri(
         string $expected,
         array $parts,
-        string $passwordFormat
+        string $passwordFormat,
     ): void {
+        $stringUtils = new StringUtils();
         $this->tester->assertSame(
             $expected,
-            Uri::build($parts, $passwordFormat)
+            $stringUtils->buildUri($parts, $passwordFormat),
         );
     }
 }

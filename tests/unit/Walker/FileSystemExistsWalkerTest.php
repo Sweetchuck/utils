@@ -4,19 +4,19 @@ declare(strict_types = 1);
 
 namespace Sweetchuck\Utils\Tests\Unit\Walker;
 
+use Codeception\Attribute\DataProvider;
 use Codeception\Test\Unit;
 use org\bovigo\vfs\vfsStream;
+use Sweetchuck\Utils\Tests\Unit\TestBase;
 use Sweetchuck\Utils\Walker\FileSystemExistsWalker;
 
-class FileSystemExistsWalkerTest extends Unit
+class FileSystemExistsWalkerTest extends TestBase
 {
 
     /**
-     * @var \Sweetchuck\Utils\Test\UnitTester
+     * @return mixed[]
      */
-    protected $tester;
-
-    public function casesWalk(): array
+    public static function casesWalk(): array
     {
         $structure = [
             'a' => [
@@ -54,8 +54,12 @@ class FileSystemExistsWalkerTest extends Unit
     }
 
     /**
-     * @dataProvider casesWalk
+     * @param mixed[] $expected
+     * @param mixed[] $structure
+     * @param mixed[] $items
+     * @param mixed[] $options
      */
+    #[DataProvider('casesWalk')]
     public function testWalk(array $expected, array $structure, array $items, array $options = []): void
     {
         $vfs = vfsStream::setup('root', 0777, $structure);

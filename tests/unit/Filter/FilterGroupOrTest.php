@@ -4,18 +4,24 @@ declare(strict_types = 1);
 
 namespace Sweetchuck\Utils\Tests\Unit\Filter;
 
-use Codeception\Test\Unit;
-use Sweetchuck\Utils\Filter\ArrayFilterByPropertyValue;
-use Sweetchuck\Utils\Filter\ArrayFilterGroupOr;
+use Sweetchuck\Utils\Filter\ArrayAllowedValueFilter;
+use Sweetchuck\Utils\Filter\FilterGroupOr;
+use Sweetchuck\Utils\Filter\FilterInterface;
 
-class ArrayFilterGroupOrTest extends Unit
+class FilterGroupOrTest extends FilterTestBase
 {
     /**
-     * @var \Sweetchuck\Utils\Test\UnitTester
+     * {@inheritdoc}
      */
-    protected $tester;
+    protected function createInstance(): FilterInterface
+    {
+        return new FilterGroupOr();
+    }
 
-    public function casesCheck(): array
+    /**
+     * @phpstan-return array<string, mixed>
+     */
+    public static function casesIsAllowed(): array
     {
         return [
             'basic' => [
@@ -50,33 +56,23 @@ class ArrayFilterGroupOrTest extends Unit
                 ],
                 [
                     'filters' => [
-                        'k1_is_good_1' => (new ArrayFilterByPropertyValue())
+                        'k1_is_good_1' => (new ArrayAllowedValueFilter())
                             ->setOptions([
-                                'property' => 'k1',
+                                'key' => 'k1',
                                 'allowedValues' => [
-                                    'good_1' => true,
+                                    'good_1',
                                 ],
                             ]),
-                        'k3_is_good_2' => (new ArrayFilterByPropertyValue())
+                        'k3_is_good_2' => (new ArrayAllowedValueFilter())
                             ->setOptions([
-                                'property' => 'k3',
+                                'key' => 'k3',
                                 'allowedValues' => [
-                                    'good_2' => true,
+                                    'good_2',
                                 ],
                             ]),
                     ],
                 ],
             ],
         ];
-    }
-
-    /**
-     * @dataProvider casesCheck
-     */
-    public function testCheck(array $expected, array $items, array $options = []): void
-    {
-        $filter = new ArrayFilterGroupOr();
-        $filter->setOptions($options);
-        $this->tester->assertSame($expected, array_filter($items, $filter));
     }
 }

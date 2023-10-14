@@ -4,13 +4,18 @@ declare(strict_types = 1);
 
 namespace Sweetchuck\Utils\Filter;
 
-class ArrayFilterGroupOr extends ArrayFilterGroup
+/**
+ * @template TItem
+ *
+ * @extends \Sweetchuck\Utils\Filter\FilterGroup<TItem>
+ */
+class FilterGroupOr extends FilterGroup
 {
 
     /**
      * {@inheritdoc}
      */
-    protected function checkDoIt($item, ?string $outerKey = null)
+    protected function setResult($item, null|int|string $outerKey = null): static
     {
         $filters = $this->getFilters();
         if (!$filters) {

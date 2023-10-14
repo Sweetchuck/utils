@@ -2,7 +2,7 @@
 
 declare(strict_types = 1);
 
-namespace Sweetchuck\Utils\Test\Helper\Dummy;
+namespace Sweetchuck\Utils\Tests\Helper\Dummy;
 
 use Sweetchuck\Utils\EnabledInterface;
 

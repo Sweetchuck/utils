@@ -7,6 +7,9 @@ namespace Sweetchuck\Utils\Walker;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
 
+/**
+ * @phpstan-import-type SweetchuckUtilsFileSystemExistsWalkerOptions from \Sweetchuck\Utils\Phpstan
+ */
 class FileSystemExistsWalker
 {
     public string $baseDir = '.';
@@ -16,10 +19,7 @@ class FileSystemExistsWalker
         return $this->baseDir;
     }
 
-    /**
-     * @return $this
-     */
-    public function setBaseDir(string $baseDir)
+    public function setBaseDir(string $baseDir): static
     {
         $this->baseDir = $baseDir;
 
@@ -28,20 +28,10 @@ class FileSystemExistsWalker
 
     protected Filesystem $fs;
 
-    public function __construct(?Filesystem $fs = null)
-    {
-        $this->fs = $fs ?: new Filesystem();
-    }
-
-    public function __invoke(bool &$exists, string $filePath)
-    {
-        $this->process($exists, $filePath);
-    }
-
     /**
-     * @return $this
+     * @phpstan-param SweetchuckUtilsFileSystemExistsWalkerOptions $options
      */
-    public function setOptions(array $options)
+    public function setOptions(array $options): static
     {
         if (array_key_exists('baseDir', $options)) {
             $this->setBaseDir($options['baseDir']);
@@ -50,7 +40,17 @@ class FileSystemExistsWalker
         return $this;
     }
 
-    public function process(bool &$exists, string $filePath)
+    public function __construct(?Filesystem $fs = null)
+    {
+        $this->fs = $fs ?: new Filesystem();
+    }
+
+    public function __invoke(bool &$exists, string $filePath): void
+    {
+        $this->process($exists, $filePath);
+    }
+
+    public function process(bool &$exists, string $filePath): static
     {
         // @todo Wildcard/Glob support.
         $baseDir = $this->getBaseDir();
@@ -60,5 +60,7 @@ class FileSystemExistsWalker
         }
 
         $exists = $this->fs->exists($filePath);
+
+        return $this;
     }
 }

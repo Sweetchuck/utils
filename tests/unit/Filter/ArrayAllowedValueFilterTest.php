@@ -4,23 +4,24 @@ declare(strict_types = 1);
 
 namespace Sweetchuck\Utils\Tests\Unit\Filter;
 
-use Codeception\Test\Unit;
-use Sweetchuck\Utils\Filter\ArrayFilterByPropertyValue;
+use Sweetchuck\Utils\Filter\ArrayAllowedValueFilter;
+use Sweetchuck\Utils\Filter\FilterInterface;
 
 /**
- * @covers \Sweetchuck\Utils\Filter\ArrayFilterByPropertyValue<extended>
+ * @covers \Sweetchuck\Utils\Filter\ArrayAllowedValueFilter
+ * @covers \Sweetchuck\Utils\Filter\FilterBase
  */
-class ArrayFilterByPropertyValueTest extends Unit
+class ArrayAllowedValueFilterTest extends FilterTestBase
 {
-    /**
-     * @var \Sweetchuck\Utils\Test\UnitTester
-     */
-    protected $tester;
+    protected function createInstance(): FilterInterface
+    {
+        return new ArrayAllowedValueFilter();
+    }
 
     /**
-     * @return array
+     * {@inheritdoc}
      */
-    public function casesCheck(): array
+    public static function casesIsAllowed(): array
     {
         return [
             'empty' => [
@@ -40,8 +41,8 @@ class ArrayFilterByPropertyValueTest extends Unit
                 ],
                 [
                     'allowedValues' => [
-                        'a/a' => '',
-                        'a/b' => '',
+                        'a/a',
+                        'a/b',
                     ],
                 ],
             ],
@@ -57,23 +58,13 @@ class ArrayFilterByPropertyValueTest extends Unit
                     ['id' => 'c/a'],
                 ],
                 [
-                    'property' => 'id',
+                    'key' => 'id',
                     'allowedValues' => [
-                        'a/a' => '',
-                        'a/b' => '',
+                        'a/a',
+                        'a/b',
                     ],
                 ],
             ],
         ];
-    }
-
-    /**
-     * @dataProvider casesCheck
-     */
-    public function testCheck(array $expected, array $items, array $options = []): void
-    {
-        $filter = new ArrayFilterByPropertyValue();
-        $filter->setOptions($options);
-        $this->tester->assertSame($expected, array_filter($items, $filter));
     }
 }

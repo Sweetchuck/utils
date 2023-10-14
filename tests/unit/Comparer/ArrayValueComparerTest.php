@@ -4,20 +4,22 @@ declare(strict_types = 1);
 
 namespace Sweetchuck\Utils\Tests\Unit\Comparer;
 
-use Codeception\Test\Unit;
+use Codeception\Attribute\DataProvider;
 use Sweetchuck\Utils\Comparer\ArrayValueComparer;
-use Sweetchuck\Utils\ComparerInterface;
-use Sweetchuck\Utils\Test\UnitTester;
+use Sweetchuck\Utils\Comparer\OrderDirection;
+use Sweetchuck\Utils\Tests\Unit\TestBase;
 
 /**
- * @covers \Sweetchuck\Utils\Comparer\ArrayValueComparer<extended>
+ * @covers \Sweetchuck\Utils\Comparer\ArrayValueComparer
+ * @covers \Sweetchuck\Utils\Comparer\ComparerBase
  */
-class ArrayValueComparerTest extends Unit
+class ArrayValueComparerTest extends TestBase
 {
 
-    protected UnitTester $tester;
-
-    public function casesCompare(): array
+    /**
+     * @return mixed[]
+     */
+    public static function casesCompare(): array
     {
         return [
             'empty' => [
@@ -49,7 +51,14 @@ class ArrayValueComparerTest extends Unit
                     'i1' => ['k1' => 1, 'k2' => 1, 'k3' => 1, 'k4' => 1],
                     'i3' => ['k1' => 1, 'k2' => 1, 'k3' => 1, 'k4' => 3],
                 ],
-                ['k1' => 0, 'k2' => 0, 'k3' => 0, 'k4' => 0],
+                [
+                    'keys' => [
+                        'k1' => 0,
+                        'k2' => 0,
+                        'k3' => 0,
+                        'k4' => 0,
+                    ],
+                ],
             ],
             'basic descending' => [
                 [
@@ -64,8 +73,15 @@ class ArrayValueComparerTest extends Unit
                     'i1' => ['k1' => 1, 'k2' => 1, 'k3' => 1, 'k4' => 1],
                     'i3' => ['k1' => 1, 'k2' => 1, 'k3' => 1, 'k4' => 3],
                 ],
-                ['k1' => 0, 'k2' => 0, 'k3' => 0, 'k4' => 0],
-                -1,
+                [
+                    'keys' => [
+                        'k1' => 0,
+                        'k2' => 0,
+                        'k3' => 0,
+                        'k4' => 0,
+                    ],
+                    'direction' => -1,
+                ],
             ],
             'complex 1' => [
                 ['a1', 'a5', 'a9', 'a20'],
@@ -76,8 +92,10 @@ class ArrayValueComparerTest extends Unit
                     'a1' => ['k1' => 'a1'],
                 ],
                 [
-                    'k1' => [
-                        'default' => 'a5',
+                    'keys' => [
+                        'k1' => [
+                            'default' => 'a5',
+                        ],
                     ],
                 ],
             ],
@@ -91,11 +109,13 @@ class ArrayValueComparerTest extends Unit
                     'a1' => ['k1' => 'a1'],
                 ],
                 [
-                    'k1' => [
-                        'default' => 'a5',
-                    ],
-                    'k2' => [
-                        'direction' => ComparerInterface::DIR_DESCENDING,
+                    'keys' => [
+                        'k1' => [
+                            'default' => 'a5',
+                        ],
+                        'k2' => [
+                            'direction' => OrderDirection::DESC->value,
+                        ],
                     ],
                 ],
             ],
@@ -103,18 +123,18 @@ class ArrayValueComparerTest extends Unit
     }
 
     /**
-     * @dataProvider casesCompare
+     * @param mixed[] $expected
+     * @param mixed[] $items
+     * @param mixed[] $options
      */
+    #[DataProvider('casesCompare')]
     public function testCompare(
         array $expected,
         array $items,
-        array $keys,
-        ?int $direction = null
+        array $options,
     ): void {
-        $comparer = new ArrayValueComparer($keys);
-        if ($direction !== null) {
-            $comparer->setDirection($direction);
-        }
+        $comparer = new ArrayValueComparer();
+        $comparer->setOptions($options);
 
         $itemsCopy = [];
         foreach ($items as $key => $value) {

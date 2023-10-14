@@ -4,18 +4,24 @@ declare(strict_types = 1);
 
 namespace Sweetchuck\Utils\Tests\Unit\Filter;
 
-use Codeception\Test\Unit;
-use Sweetchuck\Utils\Filter\ArrayFilterEnabled;
-use Sweetchuck\Utils\Test\Helper\Dummy\Status;
+use Sweetchuck\Utils\Filter\EnabledFilter;
+use Sweetchuck\Utils\Filter\FilterInterface;
+use Sweetchuck\Utils\Tests\Helper\Dummy\Status;
 
-class ArrayFilterEnabledTest extends Unit
+class EnabledFilterTest extends FilterTestBase
 {
     /**
-     * @var \Sweetchuck\Utils\Test\UnitTester
+     * {@inheritdoc}
      */
-    protected $tester;
+    protected function createInstance(): FilterInterface
+    {
+        return new EnabledFilter();
+    }
 
-    public function casesCheck(): array
+    /**
+     * {@inheritdoc}
+     */
+    public static function casesIsAllowed(): array
     {
         $items = [
             'a' => [
@@ -40,6 +46,9 @@ class ArrayFilterEnabledTest extends Unit
             ],
             'm' => (object) ['custom' => true],
             'n' => (object) ['custom' => false],
+            'o' => '0',
+            'p' => 'true',
+            'q' => 'false',
         ];
 
         return [
@@ -48,41 +57,41 @@ class ArrayFilterEnabledTest extends Unit
                 [],
             ],
             'basic' => [
-                array_intersect_key($items, array_flip(['a', 'c', 'd', 'f', 'h', 'j', 'k', 'l', 'm', 'n'])),
+                array_intersect_key($items, array_flip(['a', 'c', 'd', 'f', 'h', 'j', 'k', 'l', 'm', 'n', 'p', 'q'])),
                 $items,
             ],
             'inverse' => [
-                array_intersect_key($items, array_flip(['b', 'e', 'g', 'i'])),
+                array_intersect_key($items, array_flip(['b', 'e', 'g', 'i', 'o'])),
                 $items,
                 [
                     'inverse' => true,
-                ]
+                ],
             ],
             'defaultValue: false' => [
-                array_intersect_key($items, array_flip(['a', 'd', 'f', 'h'])),
+                array_intersect_key($items, array_flip(['a', 'd', 'f', 'h', 'j', 'p', 'q'])),
                 $items,
                 [
                     'defaultValue' => false,
                 ],
             ],
             'key: custom; defaultValue: false' => [
-                array_intersect_key($items, array_flip(['d', 'h', 'k', 'm'])),
+                array_intersect_key($items, array_flip(['d', 'h', 'k', 'm', 'j', 'p', 'q'])),
                 $items,
                 [
                     'key' => 'custom',
                     'defaultValue' => false,
                 ],
             ],
+            'string mapping' => [
+                array_intersect_key($items, array_flip(['a', 'c', 'd', 'f', 'h', 'j', 'k', 'l', 'm', 'n', 'o', 'p'])),
+                $items,
+                [
+                    'stringToBool' => [
+                        '0' => true,
+                        'false' => false,
+                    ],
+                ],
+            ],
         ];
-    }
-
-    /**
-     * @dataProvider casesCheck
-     */
-    public function testCheck(array $expected, array $items, array $options = []): void
-    {
-        $filter = new ArrayFilterEnabled();
-        $filter->setOptions($options);
-        $this->tester->assertSame($expected, array_filter($items, $filter));
     }
 }
