@@ -23,6 +23,12 @@ class VersionNumber implements \JsonSerializable
     /**
      * WARNING: This allows non-numeric values as well.
      * For example: "a.b" or "1.x".
+     *
+     * @todo Strict format checking.
+     * @todo Major should be numeric only (0|[1-9][0-9]*).
+     * @todo Minor should be numeric or "x" if patch is omitted.
+     * @todo Patch should be numeric or "x".
+     * @todo PreRelease format checking.
      */
     const VERSION_PARSER_REGEX = <<<'REGEXP'
 /^
@@ -140,16 +146,25 @@ REGEXP;
         return $instance;
     }
 
-    public static function createFromString(string $version): static
+    public static function trimPrefix(string $version): string
     {
-        return static::__set_state(static::explode($version));
+        return preg_replace('/^v(\d+\.)/u', '$1', $version);
+    }
+
+    public static function createFromString(string $version, bool $trimPrefix = true): static
+    {
+        return static::__set_state(static::explode($version, $trimPrefix));
     }
 
     /**
      * @phpstan-return VersionNumberParts
      */
-    public static function explode(string $version): array
+    public static function explode(string $version, bool $trimPrefix = true): array
     {
+        if ($trimPrefix) {
+            $version = static::trimPrefix($version);
+        }
+
         $matches = [];
         preg_match(static::VERSION_PARSER_REGEX, $version, $matches);
 
@@ -158,12 +173,16 @@ REGEXP;
             function ($key) {
                 return !is_numeric($key);
             },
-            ARRAY_FILTER_USE_KEY,
+            \ARRAY_FILTER_USE_KEY,
         );
     }
 
-    public static function isValid(string $version): bool
+    public static function isValid(string $version, bool $trimPrefix = true): bool
     {
+        if ($trimPrefix) {
+            $version = static::trimPrefix($version);
+        }
+
         return preg_match(static::VERSION_PARSER_REGEX, $version) === 1;
     }
 
