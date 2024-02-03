@@ -158,18 +158,55 @@ class VersionNumberTest extends TestBase
             ];
         }
 
+        $cases['v1.2.3 trimPrefix true'] = [
+            'array' => [
+                'major' => '1',
+                'minor' => '2',
+                'patch' => '3',
+            ],
+            'v1.2.3',
+            true,
+        ];
+
+        $cases['v1.2.3 trimPrefix false'] = [
+            'array' => [
+                'major' => 'v1',
+                'minor' => '2',
+                'patch' => '3',
+            ],
+            'v1.2.3',
+            false,
+        ];
+
         return $cases;
     }
 
     /**
      * @param mixed[] $expected
-     * @param string $version
      */
     #[DataProvider('casesCreateFromString')]
-    public function testCreateFromString(array $expected, string $version): void
+    public function testCreateFromString(array $expected, string $version, bool $trimPrefix = true): void
     {
-        $instance = VersionNumber::createFromString($version);
+        $instance = VersionNumber::createFromString($version, $trimPrefix);
         $this->tester->assertSame($expected, $instance->jsonSerialize());
+    }
+
+    public function testTrimPrefix(): void
+    {
+        $versionPlain = '1.2.3';
+        $versionPrefix = 'v1.2.3';
+
+        $this->tester->assertSame(
+            $versionPlain,
+            VersionNumber::trimPrefix($versionPrefix),
+            'prefix "v" is trimmed off',
+        );
+
+        $this->tester->assertSame(
+            $versionPlain,
+            VersionNumber::trimPrefix($versionPlain),
+            'version without "v" prefix is untouched',
+        );
     }
 
     /**
@@ -339,7 +376,19 @@ class VersionNumberTest extends TestBase
             'empty' => [false, ''],
             '1.2.3-alpha4+foo' => [true, '1.2.3-alpha4+foo'],
             '1.2.3-alpha4' => [true, '1.2.3-alpha4'],
-            '1.2.3' => [true, '1.2.3'],
+            '1.2.3, true' => [true, '1.2.3', true],
+            '1.2.3, false' => [true, '1.2.3', false],
+            'v1.2.3, true, valid prefix' => [true, 'v1.2.3', true],
+
+            // @todo This is valid because there is no strict format checking.
+            'v1.2.3, false, valid prefix' => [true, 'v1.2.3', false],
+
+            // @todo This is valid because there is no strict format checking.
+            'x1.2.3, true, not valid prefix' => [true, 'x1.2.3', true],
+
+            // @todo This is valid because there is no strict format checking.
+            'x1.2.3, false, not valid prefix' => [true, 'x1.2.3', false],
+
             '1.2' => [true, '1.2'],
             '1' => [true, '1'],
             '1.2-alpha4+foo' => [true, '1.2-alpha4+foo'],
@@ -352,9 +401,13 @@ class VersionNumberTest extends TestBase
     }
 
     #[DataProvider('casesIsValid')]
-    public function testIsValid(bool $expected, string $version): void
+    public function testIsValid(bool $expected, string $version, bool $trimPrefix = true): void
     {
-        $this->tester->assertSame($expected, VersionNumber::isValid($version));
+        $this->tester->assertSame(
+            $expected,
+            VersionNumber::isValid($version, $trimPrefix),
+            sprintf("Version %s %s valid", $version, ($expected ? 'is' : 'is not')),
+        );
     }
 
     /**
