@@ -153,29 +153,29 @@ class VersionNumberTest extends TestBase
         $cases = [];
         foreach (static::casesTransformation() as $key => $case) {
             $cases[$key] = [
-                $case['array'],
-                $case['string'],
+                'expected' => $case['array'],
+                'version' => $case['string'],
             ];
         }
 
         $cases['v1.2.3 trimPrefix true'] = [
-            'array' => [
+            'expected' => [
                 'major' => '1',
                 'minor' => '2',
                 'patch' => '3',
             ],
-            'v1.2.3',
-            true,
+            'version' => 'v1.2.3',
+            'trimPrefix' => true,
         ];
 
         $cases['v1.2.3 trimPrefix false'] = [
-            'array' => [
+            'expected' => [
                 'major' => 'v1',
                 'minor' => '2',
                 'patch' => '3',
             ],
-            'v1.2.3',
-            false,
+            'version' => 'v1.2.3',
+            'trimPrefix' => false,
         ];
 
         return $cases;

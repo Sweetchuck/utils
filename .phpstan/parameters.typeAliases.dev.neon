@@ -1,0 +1,10 @@
+parameters:
+    typeAliases:
+        php-executable: '''
+            array{
+                enabled: bool,
+                baseDir?: null|string,
+                command: string,
+                envVars?: array<string, null|string>,
+            }
+        '''

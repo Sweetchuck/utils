@@ -3,7 +3,7 @@ parameters:
         comparison-result-value: '-1|0|1|int<-1, 1>'
         order-direction-value: '-1|1'
         order-direction-name: '"asc"|"desc"|"ASC"|"DESC"'
-        order-direction-mixed: 'order-direction-value|"asc"|order-direction-name|\Sweetchuck\Utils\Comparer\OrderDirection'
+        order-direction-mixed: 'order-direction-value|order-direction-name|\Sweetchuck\Utils\Comparer\OrderDirection'
         sweetchuck-utils-comparer: 'callable(mixed, mixed): comparison-result-value'
         url-parts: '''
             array{
@@ -19,6 +19,7 @@ parameters:
         '''
         url-password-format: '"hidden"|"placeholder"|"raw"'
 
+        version-number-part: '\Sweetchuck\Utils\VersionNumberPart|"major"|"minor"|"patch"|"preRelease"|"metadata"'
         version-number-parts: '''
             array{
                 major?: ?string,
@@ -74,9 +75,8 @@ parameters:
         sweetchuck-utils-custom-filter-options: '''
             array{
                 inverse?: bool,
-                value1Fetcher?: string|callable,
-                operator?: string,
-                value2Fetcher?: null|string|callable,
+                argCollector?: null|callable,
+                operator?: null|callable,
             }
         '''
         sweetchuck-utils-enabled-filter-options: '''

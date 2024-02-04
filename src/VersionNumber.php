@@ -113,6 +113,18 @@ REGEXP;
     /**
      * @return string[]
      */
+    public static function getPartNames(): array
+    {
+        return array_keys(static::$defaultValues);
+    }
+
+    /**
+     * @return string[]
+     *
+     * @deprecated See ::getPartNames().
+     *
+     * @see getPartNames()
+     */
     public static function getFragmentNames(): array
     {
         return array_keys(static::$defaultValues);
@@ -201,14 +213,14 @@ REGEXP;
             : null;
     }
 
-    public static function assertFragmentName(string $name): void
+    public static function assertPartName(string $name): void
     {
         if (isset(static::$propertyMapping[$name])) {
             return;
         }
 
         throw new \InvalidArgumentException(sprintf(
-            'invalid fragment name: "%s" allowed values: %s',
+            'invalid part name: "%s" allowed values: %s',
             $name,
             implode(', ', array_keys(static::$propertyMapping)),
         ));
@@ -304,23 +316,23 @@ REGEXP;
 
     public function get(string $name): string
     {
-        static::assertFragmentName($name);
+        static::assertPartName($name);
 
         return $this->{static::$propertyMapping[$name]};
     }
 
     public function set(string $name, string $value): static
     {
-        static::assertFragmentName($name);
+        static::assertPartName($name);
         $this->{static::$propertyMapping[$name]} = $value;
 
         return $this;
     }
 
-    public function reset(string $fragment = 'major'): static
+    public function reset(string $part = 'major'): static
     {
-        static::assertFragmentName($fragment);
-        switch ($fragment) {
+        static::assertPartName($part);
+        switch ($part) {
             case 'major':
                 $this->major = '';
                 // no break
@@ -365,9 +377,9 @@ REGEXP;
         );
     }
 
-    public function bump(string $fragment, int $amount = 1): static
+    public function bump(string $part, int $amount = 1): static
     {
-        static::assertFragmentName($fragment);
+        static::assertPartName($part);
         if ($amount === 0) {
             return $this;
         }
@@ -377,15 +389,15 @@ REGEXP;
         }
 
         $this
-            ->bumpReset($fragment)
-            ->bumpIncrease($fragment, $amount);
+            ->bumpReset($part)
+            ->bumpIncrease($part, $amount);
 
         return $this;
     }
 
-    protected function bumpReset(string $fragment): static
+    protected function bumpReset(string $part): static
     {
-        switch ($fragment) {
+        switch ($part) {
             case 'major':
                 $this->minor = '0';
             // no break
@@ -402,15 +414,15 @@ REGEXP;
                 break;
 
             default:
-                throw new \UnexpectedValueException("@todo Not implemented yet; fragment: $fragment", 1);
+                throw new \UnexpectedValueException("@todo Not implemented yet; part: $part", 1);
         }
 
         return $this;
     }
 
-    protected function bumpIncrease(string $fragment, int $amount): static
+    protected function bumpIncrease(string $part, int $amount): static
     {
-        switch ($fragment) {
+        switch ($part) {
             case 'major':
                 $this->major = (string) (intval($this->major) + $amount);
                 break;
