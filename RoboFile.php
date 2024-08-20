@@ -61,7 +61,7 @@ class RoboFile extends Tasks implements LoggerAwareInterface, ConfigAwareInterfa
     protected string $envVarNamePrefix = '';
 
     /**
-     * Allowed values: dev, ci, prod.
+     * Allowed values: local, dev, ci, prod.
      */
     protected string $environmentType = '';
 
@@ -265,6 +265,10 @@ class RoboFile extends Tasks implements LoggerAwareInterface, ConfigAwareInterfa
     }
 
     /**
+     * Run phpcs.
+     *
+     * @command lint:phpcs
+     *
      * @initLintReporters
      */
     public function cmdLintPhpcsExecute(): TaskInterface
@@ -273,6 +277,8 @@ class RoboFile extends Tasks implements LoggerAwareInterface, ConfigAwareInterfa
     }
 
     /**
+     * Runs phpstan analyze.
+     *
      * @command lint:phpstan
      *
      * @initLintReporters
@@ -283,6 +289,10 @@ class RoboFile extends Tasks implements LoggerAwareInterface, ConfigAwareInterfa
     }
 
     /**
+     * Runs phpmd.
+     *
+     * @command lint:phpstan
+     *
      * @initLintReporters
      */
     public function cmdLintPhpmdExecute(): TaskInterface
@@ -291,6 +301,8 @@ class RoboFile extends Tasks implements LoggerAwareInterface, ConfigAwareInterfa
     }
 
     /**
+     * Runs circleci validate.
+     *
      * @command lint:circleci-config
      */
     public function cmdLintCircleciConfigExecute(): ?TaskInterface
@@ -547,10 +559,7 @@ class RoboFile extends Tasks implements LoggerAwareInterface, ConfigAwareInterfa
             });
     }
 
-    /**
-     * @return \Sweetchuck\Robo\Phpcs\Task\PhpcsLintFiles|\Robo\Collection\CollectionBuilder
-     */
-    protected function getTaskPhpcsLint()
+    protected function getTaskPhpcsLint(): TaskInterface
     {
         $options = [
             'failOn' => 'warning',
