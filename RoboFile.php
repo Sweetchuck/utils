@@ -14,7 +14,6 @@ use Robo\Contract\ConfigAwareInterface;
 use Robo\Contract\TaskInterface;
 use Robo\Tasks;
 use Sweetchuck\LintReport\Reporter\BaseReporter;
-use Sweetchuck\Robo\Git\GitTaskLoader;
 use Sweetchuck\Robo\Phpcs\PhpcsTaskLoader;
 use Sweetchuck\Robo\PhpMessDetector\PhpmdTaskLoader;
 use Sweetchuck\Robo\Phpstan\PhpstanTaskLoader;
@@ -30,7 +29,6 @@ class RoboFile extends Tasks implements LoggerAwareInterface, ConfigAwareInterfa
     use LoggerAwareTrait;
     use ConfigAwareTrait;
     use ConfigLoader;
-    use GitTaskLoader;
     use PhpcsTaskLoader;
     use PhpstanTaskLoader;
     use PhpmdTaskLoader;
@@ -316,42 +314,6 @@ class RoboFile extends Tasks implements LoggerAwareInterface, ConfigAwareInterfa
             return null;
         }
 
-        if ($this->gitHook === 'pre-commit') {
-            $cb = $this->collectionBuilder();
-            $cb->addTask(
-                $this
-                    ->taskGitListStagedFiles()
-                    ->setPaths(['./.circleci/config.yml' => true])
-                    ->setDiffFilter(['d' => false])
-                    ->setAssetNamePrefix('staged.')
-            );
-
-            $cb->addTask(
-                $this
-                    ->taskGitReadStagedFiles()
-                    ->setCommandOnly(true)
-                    ->setWorkingDirectory('.')
-                    ->deferTaskConfiguration('setPaths', 'staged.fileNames')
-            );
-
-            $taskForEach = $this->taskForEach();
-            $taskForEach
-                ->iterationMessage('CircleCI config validate: {key}')
-                ->deferTaskConfiguration('setIterable', 'files')
-                ->withBuilder(function (
-                    CollectionBuilder $builder,
-                    string $key,
-                    $file
-                ) {
-                    $builder->addTask(
-                        $this->taskExec("{$file['command']} | circleci --skip-update-check config validate -"),
-                    );
-                });
-            $cb->addTask($taskForEach);
-
-            return $cb;
-        }
-
         return $this->taskExec('circleci --skip-update-check config validate');
     }
 
@@ -574,28 +536,6 @@ class RoboFile extends Tasks implements LoggerAwareInterface, ConfigAwareInterfa
                 ->getContainer()
                 ->get('lintCheckstyleReporter')
                 ->setDestination('tests/_output/machine/checkstyle/phpcs.psr2.xml');
-        }
-
-        if ($this->gitHook === 'pre-commit') {
-            return $this
-                ->collectionBuilder()
-                ->addTask($this
-                    ->taskPhpcsParseXml()
-                    ->setAssetNamePrefix('phpcsXml.'))
-                ->addTask($this
-                    ->taskGitListStagedFiles()
-                    ->setPaths(['*.php' => true])
-                    ->setDiffFilter(['d' => false])
-                    ->setAssetNamePrefix('staged.'))
-                ->addTask($this
-                    ->taskGitReadStagedFiles()
-                    ->setCommandOnly(true)
-                    ->setWorkingDirectory('.')
-                    ->deferTaskConfiguration('setPaths', 'staged.fileNames'))
-                ->addTask($this
-                    ->taskPhpcsLintInput($options)
-                    ->deferTaskConfiguration('setFiles', 'files')
-                    ->deferTaskConfiguration('setIgnore', 'phpcsXml.exclude-patterns'));
         }
 
         return $this->taskPhpcsLintFiles($options);
