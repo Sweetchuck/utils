@@ -4,14 +4,14 @@ declare(strict_types = 1);
 
 namespace Sweetchuck\Utils\Tests\Unit\Comparer;
 
+use PHPUnit\Framework\Attributes\CoversClass;
 use Sweetchuck\Utils\Comparer\ArrayValueComparer;
+use Sweetchuck\Utils\Comparer\ComparerBase;
 use Sweetchuck\Utils\Comparer\ComparerGroup;
 use Sweetchuck\Utils\Tests\Unit\TestBase;
 
-/**
- * @covers \Sweetchuck\Utils\Comparer\ComparerGroup
- * @covers \Sweetchuck\Utils\Comparer\ComparerBase
- */
+#[CoversClass(ComparerGroup::class)]
+#[CoversClass(ComparerBase::class)]
 class ComparerChainTest extends TestBase
 {
 
@@ -69,9 +69,9 @@ class ComparerChainTest extends TestBase
         ]);
 
         uasort($items, $comparer);
-        $this->tester->assertSame($expected, $items);
+        static::assertSame($expected, $items);
 
         uasort($itemsCopy, $comparer);
-        $this->tester->assertSame($expected, $items);
+        static::assertSame($expected, $items);
     }
 }

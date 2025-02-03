@@ -112,28 +112,26 @@ commands:
         steps:
             -
                 run:
-                    name: 'Codeception - unit'
+                    name: 'Run tests - unit'
                     command: |
                         "./$(composer config bin-dir)/robo" --ansi test unit
             -
                 codecov/upload:
                     flags: 'unit'
-                    file: './tests/_output/machine/coverage/unit/coverage.xml'
+                    file: './reports/machine/coverage/clover.xml'
             -
                 store_test_results:
                     name: 'Store unit test results'
-                    path: './tests/_output/machine/junit'
+                    path: './reports/machine/result/junit.xml'
 
 jobs:
     build:
         executor: 'php_min'
-        working_directory: '~/repo'
         steps:
             - 'checkout'
             - 'composer_install'
     lint:
         executor: 'php_min'
-        working_directory: '~/repo'
         steps:
             - 'checkout'
             - 'composer_install'

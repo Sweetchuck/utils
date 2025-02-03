@@ -4,7 +4,7 @@ declare(strict_types = 1);
 
 namespace Sweetchuck\Utils\Tests\Unit\Filter;
 
-use Codeception\Attribute\DataProvider;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Sweetchuck\Utils\Filter\FilterInterface;
 use Sweetchuck\Utils\Tests\Unit\TestBase;
 
@@ -33,6 +33,6 @@ abstract class FilterTestBase extends TestBase
     ): void {
         $filter = $this->createInstance();
         $filter->setOptions($options);
-        $this->tester->assertSame($expected, array_filter($items, $filter));
+        static::assertSame($expected, array_filter($items, $filter));
     }
 }

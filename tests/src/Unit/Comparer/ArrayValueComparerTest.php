@@ -4,15 +4,15 @@ declare(strict_types = 1);
 
 namespace Sweetchuck\Utils\Tests\Unit\Comparer;
 
-use Codeception\Attribute\DataProvider;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Sweetchuck\Utils\Comparer\ArrayValueComparer;
+use Sweetchuck\Utils\Comparer\ComparerBase;
 use Sweetchuck\Utils\Comparer\OrderDirection;
 use Sweetchuck\Utils\Tests\Unit\TestBase;
 
-/**
- * @covers \Sweetchuck\Utils\Comparer\ArrayValueComparer
- * @covers \Sweetchuck\Utils\Comparer\ComparerBase
- */
+#[CoversClass(ArrayValueComparer::class)]
+#[CoversClass(ComparerBase::class)]
 class ArrayValueComparerTest extends TestBase
 {
 
@@ -142,9 +142,9 @@ class ArrayValueComparerTest extends TestBase
         }
 
         uasort($items, $comparer);
-        $this->tester->assertSame($expected, array_keys($items));
+        static::assertSame($expected, array_keys($items));
 
         uasort($itemsCopy, $comparer);
-        $this->tester->assertSame($expected, array_keys($items));
+        static::assertSame($expected, array_keys($items));
     }
 }

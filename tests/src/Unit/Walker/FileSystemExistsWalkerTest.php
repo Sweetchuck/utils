@@ -4,12 +4,13 @@ declare(strict_types = 1);
 
 namespace Sweetchuck\Utils\Tests\Unit\Walker;
 
-use Codeception\Attribute\DataProvider;
-use Codeception\Test\Unit;
 use org\bovigo\vfs\vfsStream;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Sweetchuck\Utils\Tests\Unit\TestBase;
 use Sweetchuck\Utils\Walker\FileSystemExistsWalker;
 
+#[CoversClass(FileSystemExistsWalker::class)]
 class FileSystemExistsWalkerTest extends TestBase
 {
 
@@ -73,6 +74,6 @@ class FileSystemExistsWalkerTest extends TestBase
 
         array_walk($items, $walker);
 
-        $this->tester->assertSame($expected, $items);
+        static::assertSame($expected, $items);
     }
 }

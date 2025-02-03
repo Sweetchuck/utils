@@ -93,10 +93,17 @@ parameters:
                 baseDir?: string,
             }
         '''
+        sweetchuck-utils-filter-group-base-options: '''
+            array{
+                inverse?: bool,
+                filters?: array<callable>,
+            }
+        '''
         sweetchuck-utils-filter-group-options: '''
             array{
                 inverse?: bool,
                 filters?: array<callable>,
+                type?: 'AND'|'OR',
             }
         '''
         sweetchuck-utils-file-system-exists-walker-options: '''

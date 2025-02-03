@@ -4,13 +4,13 @@ declare(strict_types = 1);
 
 namespace Sweetchuck\Utils\Tests\Unit\Filter;
 
+use PHPUnit\Framework\Attributes\CoversClass;
 use Sweetchuck\Utils\Filter\ArrayAllowedValueFilter;
+use Sweetchuck\Utils\Filter\FilterBase;
 use Sweetchuck\Utils\Filter\FilterInterface;
 
-/**
- * @covers \Sweetchuck\Utils\Filter\ArrayAllowedValueFilter
- * @covers \Sweetchuck\Utils\Filter\FilterBase
- */
+#[CoversClass(ArrayAllowedValueFilter::class)]
+#[CoversClass(FilterBase::class)]
 class ArrayAllowedValueFilterTest extends FilterTestBase
 {
     protected function createInstance(): FilterInterface

@@ -4,12 +4,11 @@ declare(strict_types = 1);
 
 namespace Sweetchuck\Utils\Tests\Unit;
 
-use Codeception\Attribute\DataProvider;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Sweetchuck\Utils\VersionNumber;
 
-/**
- * @covers \Sweetchuck\Utils\VersionNumber
- */
+#[CoversClass(VersionNumber::class)]
 class VersionNumberTest extends TestBase
 {
 
@@ -17,27 +16,10 @@ class VersionNumberTest extends TestBase
     {
         $version = VersionNumber::createFromString('1.2.3-beta4+foo');
 
-        $this->tester->assertFalse(isset($version->formatNOPE));
-        $this->tester->assertTrue(isset($version->formatMA0DMI0));
+        static::assertFalse(isset($version->formatNOPE));
+        static::assertTrue(isset($version->formatMA0DMI0));
 
-        $this->tester->assertSame('010203', $version->formatMA2MI2P2);
-
-        try {
-            // @phpstan-ignore-next-line property.notFound
-            $this->tester->assertIsString($version->formatNOPE);
-            $this->fail('Where is the exception?');
-        } catch (\Codeception\Exception\Notice $e) {
-            $this->tester->assertSame(1024, $e->getCode());
-            $this->tester->assertRegExp(
-                // This error message differs in different PHP versions.
-                implode(' ', [
-                    '@^Undefined property via __get\(\): formatNOPE',
-                    'in .+?/tests/unit/VersionNumberTest\.php',
-                    'on line \d+\b@',
-                ]),
-                $e->getMessage(),
-            );
-        }
+        static::assertSame('010203', $version->formatMA2MI2P2);
     }
 
     /**
@@ -188,7 +170,7 @@ class VersionNumberTest extends TestBase
     public function testCreateFromString(array $expected, string $version, bool $trimPrefix = true): void
     {
         $instance = VersionNumber::createFromString($version, $trimPrefix);
-        $this->tester->assertSame($expected, $instance->jsonSerialize());
+        static::assertSame($expected, $instance->jsonSerialize());
     }
 
     public function testTrimPrefix(): void
@@ -196,13 +178,13 @@ class VersionNumberTest extends TestBase
         $versionPlain = '1.2.3';
         $versionPrefix = 'v1.2.3';
 
-        $this->tester->assertSame(
+        static::assertSame(
             $versionPlain,
             VersionNumber::trimPrefix($versionPrefix),
             'prefix "v" is trimmed off',
         );
 
-        $this->tester->assertSame(
+        static::assertSame(
             $versionPlain,
             VersionNumber::trimPrefix($versionPlain),
             'version without "v" prefix is untouched',
@@ -232,7 +214,7 @@ class VersionNumberTest extends TestBase
     public function testToString(string $expected, array $values): void
     {
         $instance = VersionNumber::__set_state($values);
-        $this->tester->assertSame($expected, (string)$instance);
+        static::assertSame($expected, (string)$instance);
     }
 
     /**
@@ -276,7 +258,7 @@ class VersionNumberTest extends TestBase
         string $format,
     ): void {
         $instance = VersionNumber::createFromString($version);
-        $this->tester->assertSame($expected, $instance->format($format));
+        static::assertSame($expected, $instance->format($format));
     }
 
     /**
@@ -329,7 +311,7 @@ class VersionNumberTest extends TestBase
     public function testFormatConstants(string $expected, string $format, string $version): void
     {
         $instance = VersionNumber::createFromString($version);
-        $this->tester->assertSame($expected, $instance->format($format));
+        static::assertSame($expected, $instance->format($format));
     }
 
     /**
@@ -364,7 +346,7 @@ class VersionNumberTest extends TestBase
     public function testIsEmpty(bool $expected, array $parts): void
     {
         $instance = VersionNumber::__set_state($parts);
-        $this->tester->assertSame($expected, $instance->isEmpty());
+        static::assertSame($expected, $instance->isEmpty());
     }
 
     /**
@@ -403,7 +385,7 @@ class VersionNumberTest extends TestBase
     #[DataProvider('casesIsValid')]
     public function testIsValid(bool $expected, string $version, bool $trimPrefix = true): void
     {
-        $this->tester->assertSame(
+        static::assertSame(
             $expected,
             VersionNumber::isValid($version, $trimPrefix),
             sprintf("Version %s %s valid", $version, ($expected ? 'is' : 'is not')),
@@ -431,7 +413,7 @@ class VersionNumberTest extends TestBase
     #[DataProvider('casesParsePreRelease')]
     public function testParsePreRelease(?array $expected, string $preRelease): void
     {
-        $this->tester->assertSame($expected, VersionNumber::parsePreRelease($preRelease));
+        static::assertSame($expected, VersionNumber::parsePreRelease($preRelease));
     }
 
     /**
@@ -458,74 +440,62 @@ class VersionNumberTest extends TestBase
     public function testBump(string $expected, string $version, string $fragment, int $amount): void
     {
         $instance = VersionNumber::createFromString($version);
-        $this->tester->assertSame($expected, (string) $instance->bump($fragment, $amount));
+        static::assertSame($expected, (string) $instance->bump($fragment, $amount));
     }
 
     public function testBumpFailFragmentName(): void
     {
-        $this->tester->expectThrowable(
-            \InvalidArgumentException::class,
-            function () {
-                $instance = VersionNumber::createFromString('1.2.3-alpha1+foo');
-                $instance->bump('none', 42);
-            },
-        );
+        $this->expectException(\InvalidArgumentException::class);
+        $instance = VersionNumber::createFromString('1.2.3-alpha1+foo');
+        $instance->bump('none', 42);
     }
 
     public function testBumpFailNegative(): void
     {
-        $this->tester->expectThrowable(
-            \OutOfRangeException::class,
-            function () {
-                $instance = VersionNumber::createFromString('1.2.3-alpha1+foo');
-                $instance->bump('major', -42);
-            },
-        );
+        $this->expectException(\OutOfRangeException::class);
+        $instance = VersionNumber::createFromString('1.2.3-alpha1+foo');
+        $instance->bump('major', -42);
     }
 
     public function testBumpFailMetadata(): void
     {
-        $this->tester->expectThrowable(
-            \UnexpectedValueException::class,
-            function () {
-                $instance = VersionNumber::createFromString('1.2.3-alpha1+foo');
-                $instance->bump('metadata');
-            },
-        );
+        $this->expectException(\UnexpectedValueException::class);
+        $instance = VersionNumber::createFromString('1.2.3-alpha1+foo');
+        $instance->bump('metadata');
     }
 
     public function testGetSetReset(): void
     {
         $instance = VersionNumber::createFromString('1.2.3-alpha4+foo');
-        $this->tester->assertSame('1', $instance->get('major'));
-        $this->tester->assertSame('2', $instance->get('minor'));
-        $this->tester->assertSame('3', $instance->get('patch'));
-        $this->tester->assertSame('alpha4', $instance->get('pre-release'));
-        $this->tester->assertSame('foo', $instance->get('metadata'));
+        static::assertSame('1', $instance->get('major'));
+        static::assertSame('2', $instance->get('minor'));
+        static::assertSame('3', $instance->get('patch'));
+        static::assertSame('alpha4', $instance->get('pre-release'));
+        static::assertSame('foo', $instance->get('metadata'));
 
         $instance->reset('metadata');
-        $this->tester->assertSame('1.2.3-alpha4', (string) $instance);
+        static::assertSame('1.2.3-alpha4', (string) $instance);
         $instance->reset('pre-release');
-        $this->tester->assertSame('1.2.3', (string) $instance);
+        static::assertSame('1.2.3', (string) $instance);
         $instance->reset('patch');
-        $this->tester->assertSame('1.2', (string) $instance);
+        static::assertSame('1.2', (string) $instance);
         $instance->reset('minor');
-        $this->tester->assertSame('1', (string) $instance);
+        static::assertSame('1', (string) $instance);
         $instance->reset();
-        $this->tester->assertSame('', (string) $instance);
-        $this->tester->assertTrue($instance->isEmpty());
+        static::assertSame('', (string) $instance);
+        static::assertTrue($instance->isEmpty());
 
         // @todo Set the "metadata" first when it is empty.
         $instance->set('major', '1');
-        $this->tester->assertSame('1', (string) $instance);
+        static::assertSame('1', (string) $instance);
         $instance->set('minor', '2');
-        $this->tester->assertSame('1.2', (string) $instance);
+        static::assertSame('1.2', (string) $instance);
         $instance->set('patch', '3');
-        $this->tester->assertSame('1.2.3', (string) $instance);
+        static::assertSame('1.2.3', (string) $instance);
         $instance->set('preReleaseVersion', 'beta1');
-        $this->tester->assertSame('1.2.3-beta1', (string) $instance);
+        static::assertSame('1.2.3-beta1', (string) $instance);
         $instance->set('metadata', 'baz');
-        $this->tester->assertSame('1.2.3-beta1+baz', (string) $instance);
+        static::assertSame('1.2.3-beta1+baz', (string) $instance);
     }
 
     /**
@@ -620,6 +590,6 @@ class VersionNumberTest extends TestBase
     {
         $a = VersionNumber::createFromString($aVersion);
         $b = VersionNumber::createFromString($bVersion);
-        $this->tester->assertSame($expected, $a->diff($b));
+        static::assertSame($expected, $a->diff($b));
     }
 }

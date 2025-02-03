@@ -4,14 +4,14 @@ declare(strict_types = 1);
 
 namespace Sweetchuck\Utils\Tests\Unit;
 
-use Codeception\Attribute\DataProvider;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Sweetchuck\Utils\StringUtils;
 
 /**
  * @phpstan-import-type UrlPasswordFormat from \Sweetchuck\Utils\Phpstan
- *
- * @covers \Sweetchuck\Utils\StringUtils
  */
+#[CoversClass(StringUtils::class)]
 class StringUtilsTest extends TestBase
 {
 
@@ -60,7 +60,7 @@ class StringUtilsTest extends TestBase
         array $args = [],
     ): void {
         $stringUtils = new StringUtils();
-        $this->tester->assertSame(
+        static::assertSame(
             $expected,
             $stringUtils->vsprintf($format, $args),
         );
@@ -162,7 +162,7 @@ class StringUtilsTest extends TestBase
         string $passwordFormat,
     ): void {
         $stringUtils = new StringUtils();
-        $this->tester->assertSame(
+        static::assertSame(
             $expected,
             $stringUtils->buildUri($parts, $passwordFormat),
         );

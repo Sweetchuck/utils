@@ -23,6 +23,7 @@ namespace Sweetchuck\Utils;
  * @phpstan-type SweetchuckUtilsCustomFilterOptions = sweetchuck-utils-custom-filter-options
  * @phpstan-type SweetchuckUtilsEnabledFilterOptions = sweetchuck-utils-enabled-filter-options
  * @phpstan-type SweetchuckUtilsFileSystemExistsFilterOptions = sweetchuck-utils-file-system-exists-filter-options
+ * @phpstan-type SweetchuckUtilsFilterGroupBaseOptions = sweetchuck-utils-filter-group-base-options
  * @phpstan-type SweetchuckUtilsFilterGroupOptions = sweetchuck-utils-filter-group-options
  *
  * @phpstan-type SweetchuckUtilsFileSystemExistsWalkerOptions = sweetchuck-utils-file-system-exists-walker-options

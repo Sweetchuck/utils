@@ -1,4 +1,2 @@
 parameters:
-    bootstrapFiles:
-        - bootstrap.php
     level: 7

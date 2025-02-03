@@ -6,11 +6,6 @@ parameters:
 			path: ../RoboFile.php
 
 		-
-			message: "#^Call to an undefined method Robo\\\\Collection\\\\CollectionBuilder\\|Robo\\\\Task\\\\Filesystem\\\\FilesystemStack\\:\\:mkdir\\(\\)\\.$#"
-			count: 4
-			path: ../RoboFile.php
-
-		-
 			message: "#^Call to an undefined method Robo\\\\Collection\\\\CollectionBuilder\\|Sweetchuck\\\\Robo\\\\Phpstan\\\\Task\\\\AnalyzeTask\\:\\:setNoProgress\\(\\)\\.$#"
 			count: 1
 			path: ../RoboFile.php

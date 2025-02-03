@@ -4,10 +4,14 @@ declare(strict_types = 1);
 
 namespace Sweetchuck\Utils\Tests\Unit\Filter;
 
+use PHPUnit\Framework\Attributes\CoversClass;
 use Sweetchuck\Utils\Filter\ArrayAllowedValueFilter;
+use Sweetchuck\Utils\Filter\FilterGroupBase;
 use Sweetchuck\Utils\Filter\FilterGroupOr;
 use Sweetchuck\Utils\Filter\FilterInterface;
 
+#[CoversClass(FilterGroupOr::class)]
+#[CoversClass(FilterGroupBase::class)]
 class FilterGroupOrTest extends FilterTestBase
 {
     /**

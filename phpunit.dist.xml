@@ -1,0 +1,47 @@
+<phpunit
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+    cacheDirectory="./.cache/phpunit/"
+    displayDetailsOnTestsThatTriggerErrors="true"
+    displayDetailsOnTestsThatTriggerWarnings="true"
+    displayDetailsOnTestsThatTriggerDeprecations="true"
+    displayDetailsOnPhpunitDeprecations="true"
+    colors="true">
+
+    <php>
+        <!-- Set error reporting to E_ALL. -->
+        <ini name="error_reporting" value="32767" />
+
+        <!-- Do not limit the amount of memory tests take to run. -->
+        <ini name="memory_limit" value="-1" />
+    </php>
+
+    <testsuites>
+        <testsuite name="unit">
+            <directory>tests/src/Unit/</directory>
+        </testsuite>
+    </testsuites>
+
+    <source>
+        <include>
+            <directory>./src/</directory>
+        </include>
+    </source>
+
+    <logging>
+        <testdoxHtml outputFile="./reports/human/result/testdox.html" />
+        <testdoxText outputFile="./reports/human/result/testdox.txt" />
+
+        <junit outputFile="./reports/machine/result/junit.xml" />
+    </logging>
+
+    <coverage>
+        <report>
+            <html outputDirectory="./reports/human/coverage/html/" />
+
+            <xml outputDirectory="./reports/machine/coverage/xml" />
+            <clover outputFile="./reports/machine/coverage/clover.xml" />
+            <php outputFile="./reports/machine/coverage/php.php" />
+        </report>
+    </coverage>
+</phpunit>

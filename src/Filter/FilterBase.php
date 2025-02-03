@@ -67,6 +67,8 @@ abstract class FilterBase implements FilterInterface
 
     protected function getFinalResult(): bool
     {
-        return $this->getInverse() ? !$this->result : (bool) $this->result;
+        return $this->getInverse()
+            ? !$this->result
+            : (bool) $this->result;
     }
 }
