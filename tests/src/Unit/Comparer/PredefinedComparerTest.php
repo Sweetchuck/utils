@@ -4,14 +4,14 @@ declare(strict_types = 1);
 
 namespace Sweetchuck\Utils\Tests\Unit\Comparer;
 
-use Codeception\Attribute\DataProvider;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use Sweetchuck\Utils\Comparer\ComparerBase;
 use Sweetchuck\Utils\Comparer\PredefinedComparer;
 use Sweetchuck\Utils\Tests\Unit\TestBase;
 
-/**
- * @covers \Sweetchuck\Utils\Comparer\PredefinedComparer
- * @covers \Sweetchuck\Utils\Comparer\ComparerBase
- */
+#[CoversClass(PredefinedComparer::class)]
+#[CoversClass(ComparerBase::class)]
 class PredefinedComparerTest extends TestBase
 {
     /**
@@ -61,6 +61,6 @@ class PredefinedComparerTest extends TestBase
         $comparer = new PredefinedComparer();
         $comparer->setOptions($options);
         usort($items, $comparer);
-        $this->tester->assertSame($expected, $items);
+        static::assertSame($expected, $items);
     }
 }

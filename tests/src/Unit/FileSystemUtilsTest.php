@@ -4,14 +4,13 @@ declare(strict_types = 1);
 
 namespace Sweetchuck\Utils\Tests\Unit;
 
-use Codeception\Attribute\DataProvider;
 use org\bovigo\vfs\vfsStream;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Sweetchuck\Utils\FileSystemUtils;
 use Symfony\Component\Filesystem\Path;
 
-/**
- * @covers \Sweetchuck\Utils\FileSystemUtils
- */
+#[CoversClass(FileSystemUtils::class)]
 class FileSystemUtilsTest extends TestBase
 {
     protected function createInstance(): FileSystemUtils
@@ -143,7 +142,7 @@ class FileSystemUtilsTest extends TestBase
         }
 
         $filesystem = $this->createInstance();
-        $this->tester->assertSame(
+        static::assertSame(
             $expected,
             $filesystem->findFileUpward($fileName, $currentDir, $rootDir)
         );
@@ -151,13 +150,9 @@ class FileSystemUtilsTest extends TestBase
 
     public function testFindFileUpwardNotParent(): void
     {
-        $this->tester->expectThrowable(
-            \InvalidArgumentException::class,
-            function () {
-                $filesystem = $this->createInstance();
-                $filesystem->findFileUpward('a.txt', '/a', '/b');
-            },
-        );
+        $this->expectException(\InvalidArgumentException::class);
+        $filesystem = $this->createInstance();
+        $filesystem->findFileUpward('a.txt', '/a', '/b');
     }
 
     /**
@@ -223,7 +218,7 @@ class FileSystemUtilsTest extends TestBase
     public function testIsParentDirOrSame(bool $expected, string $parentDir, string $childDir): void
     {
         $filesystem = $this->createInstance();
-        $this->tester->assertSame(
+        static::assertSame(
             $expected,
             $filesystem->isParentDirOrSame($parentDir, $childDir),
         );
@@ -254,7 +249,7 @@ class FileSystemUtilsTest extends TestBase
     public function testNormalizeShellFileDescriptor(string $expected, string $fileName): void
     {
         $filesystem = $this->createInstance();
-        $this->tester->assertSame(
+        static::assertSame(
             $expected,
             $filesystem->normalizeShellFileDescriptor($fileName),
         );

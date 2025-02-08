@@ -4,11 +4,13 @@ declare(strict_types = 1);
 
 namespace Sweetchuck\Utils\Tests\Unit\Filter;
 
-use Codeception\Attribute\DataProvider;
 use org\bovigo\vfs\vfsStream;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Sweetchuck\Utils\Filter\FileSystemExistsFilter;
 use Sweetchuck\Utils\Filter\FilterInterface;
 
+#[CoversClass(FileSystemExistsFilter::class)]
 class FileSystemExistsFilterTest extends FilterTestBase
 {
     protected function createInstance(): FilterInterface

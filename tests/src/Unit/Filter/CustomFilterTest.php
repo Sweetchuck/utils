@@ -5,15 +5,13 @@ declare(strict_types = 1);
 
 namespace Sweetchuck\Utils\Tests\Unit\Filter;
 
+use PHPUnit\Framework\Attributes\CoversClass;
 use Sweetchuck\Utils\Filter\CustomFilter;
 use Sweetchuck\Utils\Filter\CustomFilterHelper;
 use Sweetchuck\Utils\Filter\FilterInterface;
 
-/**
- * @covers \Sweetchuck\Utils\Filter\CustomFilter
- * @covers \Sweetchuck\Utils\Filter\FilterBase
- * @covers \Sweetchuck\Utils\Filter\CustomFilterHelper
- */
+#[CoversClass(CustomFilter::class)]
+#[CoversClass(CustomFilterHelper::class)]
 class CustomFilterTest extends FilterTestBase
 {
 
@@ -67,7 +65,7 @@ class CustomFilterTest extends FilterTestBase
                 'operator' => is_int(...),
             ],
         ];
-        $cases['with-arg-collector with-operator ltOrEq'] = [
+        $cases['with-arg-collector with-operator lessThanOrEqual'] = [
             [
                 'a' => ['l' => 1, 'r' => 2],
                 'b' => ['l' => 2, 'r' => 2],
@@ -84,7 +82,7 @@ class CustomFilterTest extends FilterTestBase
                         $item['r'],
                     ];
                 },
-                'operator' => CustomFilterHelper::ltOrEq(...),
+                'operator' => CustomFilterHelper::lessThanOrEqual(...),
             ],
         ];
 

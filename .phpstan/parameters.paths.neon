@@ -1,8 +1,5 @@
 parameters:
     paths:
         - ../src/
-        - ../tests/
+        - ../tests/src/
         - ../RoboFile.php
-    excludePaths:
-        - ../tests/_output/
-        - ../tests/_support/_generated/

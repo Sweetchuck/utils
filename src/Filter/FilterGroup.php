@@ -4,63 +4,21 @@ declare(strict_types = 1);
 
 namespace Sweetchuck\Utils\Filter;
 
-use Sweetchuck\Utils\Phpstan;
-
 /**
  * @phpstan-import-type SweetchuckUtilsFilterGroupOptions from \Sweetchuck\Utils\Phpstan
  *
  * @template TItem
  *
- * @extends \Sweetchuck\Utils\Filter\FilterBase<TItem>
- *
- * @todo Add @template for callable.
+ * @extends \Sweetchuck\Utils\Filter\FilterGroupBase<TItem>
  */
-abstract class FilterGroup extends FilterBase
+class FilterGroup extends FilterGroupBase
 {
 
-    /**
-     * @var callable[]
-     */
-    protected array $filters = [];
-
-    /**
-     * @return callable[]
-     */
-    public function getFilters(): array
+    public function setType(string $type): static
     {
-        return $this->filters;
-    }
+        assert(in_array($type, ['AND', 'OR']));
 
-    /**
-     * @param callable[] $filters
-     */
-    public function setFilters(array $filters): static
-    {
-        $this->filters = $filters;
-
-        return $this;
-    }
-
-    public function addFilter(int|string $name, callable $filter): static
-    {
-        $this->filters[$name] = $filter;
-
-        return $this;
-    }
-
-    /**
-     * @param callable[] $filters
-     */
-    public function addFilters(array $filters): static
-    {
-        $this->filters = array_replace($this->filters, $filters);
-
-        return $this;
-    }
-
-    public function removeFilter(int|string $name): static
-    {
-        unset($this->filters[$name]);
+        $this->type = $type;
 
         return $this;
     }
@@ -72,8 +30,8 @@ abstract class FilterGroup extends FilterBase
     {
         parent::setOptions($options);
 
-        if (array_key_exists('filters', $options)) {
-            $this->setFilters($options['filters']);
+        if (array_key_exists('type', $options)) {
+            $this->setType($options['type']);
         }
 
         return $this;

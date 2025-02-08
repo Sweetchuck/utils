@@ -4,13 +4,10 @@ declare(strict_types = 1);
 
 namespace Sweetchuck\Utils\Tests\Unit;
 
-use Codeception\Test\Unit;
-use Sweetchuck\Utils\Tests\UnitTester;
+use PHPUnit\Framework\TestCase;
 
-class TestBase extends Unit
+class TestBase extends TestCase
 {
-
-    protected UnitTester $tester;
 
     protected function selfProjectRoot(): string
     {

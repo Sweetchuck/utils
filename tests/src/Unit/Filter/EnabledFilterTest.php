@@ -4,10 +4,12 @@ declare(strict_types = 1);
 
 namespace Sweetchuck\Utils\Tests\Unit\Filter;
 
+use PHPUnit\Framework\Attributes\CoversClass;
 use Sweetchuck\Utils\Filter\EnabledFilter;
 use Sweetchuck\Utils\Filter\FilterInterface;
 use Sweetchuck\Utils\Tests\Helper\Dummy\Status;
 
+#[CoversClass(EnabledFilter::class)]
 class EnabledFilterTest extends FilterTestBase
 {
     /**
