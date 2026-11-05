@@ -2,7 +2,7 @@
 version: 2.1
 
 orbs:
-    codecov: 'codecov/codecov@3.0.0'
+    codecov: 'codecov/codecov@6'
 
 .env_app: &env_app
     SHELL: '/bin/bash'
@@ -118,7 +118,7 @@ commands:
             -
                 codecov/upload:
                     flags: 'unit'
-                    file: './reports/machine/coverage/clover.xml'
+                    files: './reports/machine/coverage/clover.xml'
             -
                 store_test_results:
                     name: 'Store unit test results'
